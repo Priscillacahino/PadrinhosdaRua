@@ -1,7 +1,8 @@
 {
-  "name": "react-example",
+  "name": "padrinhos-de-rua",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "Projeto de extensão de ADS do UNIPÊ: PWA mobile first para organização comunitária de pontos de água, comida, voluntários, materiais e casinhas para animais em situação de rua em João Pessoa (PB).",
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",

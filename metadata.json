@@ -1,12 +1,14 @@
 {
-  "name": "Padrinhos de Rua - Motor & Gestão de Casinhas",
-  "description": "Motor comunitário em João Pessoa (PB): monitoramento de pontos de água e comida com GPS (<50m), TTL de 48h, e Oficina Comunitária com controle de estoque de materiais, cálculo de déficit e plano de fabricação e distribuição de casinhas.",
+  "name": "Padrinhos de Rua",
+  "description": "Projeto de extensão do curso de Análise e Desenvolvimento de Sistemas do UNIPÊ que aplica tecnologia social ao cuidado comunitário de animais em situação de rua em João Pessoa (PB). A fase piloto integra pontos de água e comida, participação voluntária, controle de materiais e uma meta inicial de até 10 casinhas comunitárias.",
   "requestFramePermissions": [
     "camera",
     "geolocation"
   ],
   "majorCapabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+    "PWA_MOBILE_FIRST",
+    "ORGANIZACAO_DE_PONTOS_COMUNITARIOS",
+    "CONTROLE_COMUNITARIO_DE_ESTOQUE",
+    "GESTAO_DE_VOLUNTARIADO"
   ]
 }
-
