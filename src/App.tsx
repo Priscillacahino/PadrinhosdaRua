@@ -1,684 +1,227 @@
-import React, { useState, useEffect } from 'react';
-import { Header } from './components/Header';
-import { StatsBar } from './components/StatsBar';
-import { InteractiveMap } from './components/InteractiveMap';
-import { PointsList } from './components/PointsList';
-import { CheckInModal } from './components/CheckInModal';
-import { UrgencyModal } from './components/UrgencyModal';
-import { NewPointModal } from './components/NewPointModal';
-import { JsonInspectorModal } from './components/JsonInspectorModal';
-import { ApiConsole } from './components/ApiConsole';
-import { OfflineIndicator } from './components/OfflineIndicator';
-import { OficinaCasinhas } from './components/OficinaCasinhas';
-import { INITIAL_PONTOS_CASINHAS, DEFAULT_USER_LOCATION } from './data/initialData';
+import React, { useMemo, useState } from 'react';
+import {
+  AlertTriangle,
+  Boxes,
+  CheckCircle2,
+  ChevronRight,
+  Droplets,
+  Hammer,
+  HeartHandshake,
+  Home,
+  Map,
+  MapPin,
+  PackagePlus,
+  PawPrint,
+  Search,
+  User,
+  Utensils,
+  Wrench,
+} from 'lucide-react';
 import {
   INITIAL_MATERIAIS_ESTOQUE,
   INITIAL_PREVISOES_CASINHAS,
-  META_CASINHAS_JOAO_PESSOA
+  META_CASINHAS_JOAO_PESSOA,
 } from './data/oficinaData';
-import {
-  PontoCasinha,
-  GPSCoords,
-  LogAcao,
-  ApiResponse,
-  MaterialEstoque,
-  PrevisaoCasinhaBairro,
-  StatusFabricacaoCasinha,
-  DoacaoMaterialPayload
-} from './types';
-import { applyTTLLogic, processCheckIn } from './utils/engine';
-import { formatDateTime } from './utils/geo';
-import {
-  Search,
-  SlidersHorizontal,
-  X,
-  Bell,
-  Sparkles,
-  Info,
-  ShieldCheck,
-  CheckCircle2,
-  AlertTriangle,
-  Hammer,
-  ArrowRight
-} from 'lucide-react';
 
-export default function App() {
-  // Estado do Banco de Dados
-  const [pontos, setPontos] = useState<PontoCasinha[]>(INITIAL_PONTOS_CASINHAS);
-  
-  // Estado de Geolocalização do Usuário (Anti-Fraude GPS)
-  const [userCoords, setUserCoords] = useState<GPSCoords>({
-    latitude: DEFAULT_USER_LOCATION.latitude,
-    longitude: DEFAULT_USER_LOCATION.longitude,
-    accuracy: 10,
-  });
-  const [gpsMode, setGpsMode] = useState<'real' | 'simulated'>('simulated');
+type Tab = 'inicio' | 'mapa' | 'oficina' | 'estoque' | 'perfil';
+type Material = (typeof INITIAL_MATERIAIS_ESTOQUE)[number];
 
-  // Relógio do Sistema & Simulação de TTL (48 horas)
-  const [currentSimulatedTime, setCurrentSimulatedTime] = useState<Date>(new Date());
-  const [ttlChangesCount, setTtlChangesCount] = useState<number>(0);
-  const [bannerNotice, setBannerNotice] = useState<{
-    tipo: 'sucesso' | 'aviso' | 'erro';
-    mensagem: string;
-  } | null>(null);
+type Point = {
+  id: number;
+  nome: string;
+  bairro: string;
+  distancia: string;
+  comida: 'ok' | 'atenção';
+  agua: 'ok' | 'atenção';
+  casinha: 'instalada' | 'planejada' | 'em montagem';
+};
 
-  // Histórico de transações / Logs de auditoria (João Pessoa - PB)
-  const [logs, setLogs] = useState<LogAcao[]>([
-    {
-      id: 'init_log_1',
-      ponto_id: 1,
-      nome_ponto: 'Casinha do Parque da Lagoa (Centro)',
-      acao: 'Check-in presencial com abastecimento',
-      timestamp: formatDateTime(new Date(Date.now() - 3.5 * 3600 * 1000)),
-      distancia_metros: 18.4,
-      status_anterior: '🟡 Amarelo',
-      status_novo: '🟢 Verde',
-    },
-    {
-      id: 'init_log_2',
-      ponto_id: 3,
-      nome_ponto: 'Ponto de Apoio Parque Parahyba (Praia do Bessa)',
-      acao: 'Varredura automática TTL (>48h sem check-in)',
-      timestamp: formatDateTime(new Date(Date.now() - 1.2 * 3600 * 1000)),
-      status_anterior: '🟢 Verde',
-      status_novo: '🟡 Amarelo',
-    },
-  ]);
+const POINTS: Point[] = [
+  { id: 1, nome: 'Parque da Lagoa', bairro: 'Centro', distancia: '1,2 km', comida: 'ok', agua: 'ok', casinha: 'planejada' },
+  { id: 2, nome: 'Orla de Tambaú', bairro: 'Tambaú', distancia: '3,8 km', comida: 'ok', agua: 'ok', casinha: 'instalada' },
+  { id: 3, nome: 'Parque Parahyba I', bairro: 'Bessa', distancia: '6,4 km', comida: 'atenção', agua: 'ok', casinha: 'em montagem' },
+  { id: 4, nome: 'Campus I - UFPB', bairro: 'Castelo Branco', distancia: '3,2 km', comida: 'ok', agua: 'atenção', casinha: 'planejada' },
+  { id: 5, nome: 'Praça do Coqueiral', bairro: 'Mangabeira', distancia: '6,1 km', comida: 'ok', agua: 'ok', casinha: 'planejada' },
+  { id: 6, nome: 'Praça Silvio Porto', bairro: 'Manaíra', distancia: '3,7 km', comida: 'ok', agua: 'ok', casinha: 'instalada' },
+];
 
-  // Filtros e Seleção
-  const [activeTab, setActiveTab] = useState<'painel' | 'oficina' | 'api'>('painel');
-  const [activeFilter, setActiveFilter] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedPontoId, setSelectedPontoId] = useState<number | null>(null);
+function App() {
+  const [tab, setTab] = useState<Tab>('inicio');
+  const [query, setQuery] = useState('');
+  const [materiais, setMateriais] = useState(INITIAL_MATERIAIS_ESTOQUE);
+  const [casinhas, setCasinhas] = useState(INITIAL_PREVISOES_CASINHAS);
+  const [toast, setToast] = useState<string | null>(null);
 
-  // Estado da Oficina Comunitária de Fabricação de Casinhas (João Pessoa - PB)
-  const [materiais, setMateriais] = useState<MaterialEstoque[]>(INITIAL_MATERIAIS_ESTOQUE);
-  const [previsoesCasinhas, setPrevisoesCasinhas] = useState<PrevisaoCasinhaBairro[]>(INITIAL_PREVISOES_CASINHAS);
+  const stats = useMemo(() => {
+    const instaladas = casinhas.filter(c => c.status === 'instalada').length;
+    const prontas = casinhas.filter(c => c.status === 'pronta').length;
+    const montagem = casinhas.filter(c => c.status === 'em_montagem').length;
+    const faltando = materiais.filter(m => m.quantidade_atual < m.consumo_por_casinha * META_CASINHAS_JOAO_PESSOA).length;
+    const capacidade = Math.max(0, Math.min(...materiais.map(m => Math.floor(m.quantidade_atual / m.consumo_por_casinha))));
+    return { instaladas, prontas, montagem, faltando, capacidade };
+  }, [casinhas, materiais]);
 
-  // Modais
-  const [checkInTarget, setCheckInTarget] = useState<PontoCasinha | null>(null);
-  const [urgencyTarget, setUrgencyTarget] = useState<PontoCasinha | null>(null);
-  const [inspectJsonTarget, setInspectJsonTarget] = useState<PontoCasinha | null>(null);
-  const [isNewPointModalOpen, setIsNewPointModalOpen] = useState<boolean>(false);
+  const filteredPoints = POINTS.filter(p => `${p.nome} ${p.bairro}`.toLowerCase().includes(query.toLowerCase()));
 
-  // Efeito para obter GPS Real do dispositivo quando solicitado
-  useEffect(() => {
-    if (gpsMode === 'real' && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserCoords({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy: position.coords.accuracy,
-          });
-          setBannerNotice({
-            tipo: 'sucesso',
-            mensagem: `GPS real conectado: [${position.coords.latitude.toFixed(5)}, ${position.coords.longitude.toFixed(5)}] com precisão de ${Math.round(position.coords.accuracy)}m.`,
-          });
-        },
-        (error) => {
-          setGpsMode('simulated');
-          setBannerNotice({
-            tipo: 'aviso',
-            mensagem: `Permissão de GPS negada ou indisponível (${error.message}). Retornando ao modo Simulador interativo.`,
-          });
-        },
-        { enableHighAccuracy: true, timeout: 8000 }
-      );
-    }
-  }, [gpsMode]);
-
-  // Executa varredura de TTL (Regra de 48h)
-  const handleRunTTLScan = () => {
-    const { pontosAtualizados, alteracoes } = applyTTLLogic(pontos, currentSimulatedTime);
-    setPontos(pontosAtualizados);
-    setTtlChangesCount(alteracoes.length);
-
-    if (alteracoes.length > 0) {
-      const novalog: LogAcao = {
-        id: `ttl_scan_${Date.now()}`,
-        ponto_id: alteracoes[0].id,
-        nome_ponto: alteracoes.map((a) => a.nome_ponto).join(', '),
-        acao: `Varredura TTL: ${alteracoes.length} ponto(s) transitaram para 🟡 Amarelo (>48h)`,
-        timestamp: formatDateTime(currentSimulatedTime),
-        status_anterior: '🟢 Verde',
-        status_novo: '🟡 Amarelo',
-      };
-      setLogs((prev) => [novalog, ...prev]);
-
-      setBannerNotice({
-        tipo: 'aviso',
-        mensagem: `Varredura de TTL executada: ${alteracoes.length} ponto(s) ultrapassaram o limite de 48h sem check-in e foram atualizados para 🟡 Amarelo.`,
-      });
-    } else {
-      setBannerNotice({
-        tipo: 'sucesso',
-        mensagem: 'Varredura de TTL concluída: Todos os pontos verdes estão dentro da janela de 48 horas.',
-      });
-    }
+  const notify = (message: string) => {
+    setToast(message);
+    window.setTimeout(() => setToast(null), 2800);
   };
 
-  // Avança o relógio do sistema para simular a passagem de tempo do TTL
-  const handleAdvanceHours = (hours: number) => {
-    const newDate = new Date(currentSimulatedTime.getTime() + hours * 3600 * 1000);
-    setCurrentSimulatedTime(newDate);
-
-    // Imediatamente aplica a regra de TTL com a nova hora
-    const { pontosAtualizados, alteracoes } = applyTTLLogic(pontos, newDate);
-    setPontos(pontosAtualizados);
-
-    if (alteracoes.length > 0) {
-      setBannerNotice({
-        tipo: 'aviso',
-        mensagem: `Relógio avançado em +${hours}h: ${alteracoes.length} casinha(s) ultrapassaram 48h de inatividade e entraram em 🟡 Amarelo!`,
-      });
-    } else {
-      setBannerNotice({
-        tipo: 'sucesso',
-        mensagem: `Relógio avançado em +${hours}h com sucesso. Hora simulada: ${formatDateTime(newDate)}`,
-      });
-    }
+  const registerDonation = (material: Material) => {
+    setMateriais(prev => prev.map(m => m.id === material.id ? { ...m, quantidade_atual: m.quantidade_atual + 1, ultimo_doador: 'Doação comunitária' } : m));
+    notify(`Doação registrada: +1 ${material.unidade} de ${material.nome}.`);
   };
 
-  const handleResetTime = () => {
-    const freshNow = new Date();
-    setCurrentSimulatedTime(freshNow);
-    setBannerNotice({
-      tipo: 'sucesso',
-      mensagem: `Relógio do sistema sincronizado com a data/hora atual: ${formatDateTime(freshNow)}`,
-    });
+  const startNextHouse = () => {
+    const next = casinhas.find(c => c.status === 'planejada');
+    if (!next) return notify('As 10 casinhas já estão em andamento ou concluídas.');
+    if (stats.capacidade < 1) return notify('Ainda faltam materiais para iniciar uma nova casinha.');
+    setCasinhas(prev => prev.map(c => c.id === next.id ? { ...c, status: 'em_montagem', voluntario_responsavel: 'Voluntário(a) da comunidade' } : c));
+    setMateriais(prev => prev.map(m => ({ ...m, quantidade_atual: Math.max(0, m.quantidade_atual - m.consumo_por_casinha) })));
+    notify(`Casinha #${next.numero_casinha} iniciada. Materiais reservados no estoque.`);
   };
-
-  // Teletransporta o usuário para próximo ou longe de uma casinha
-  const handleTeleport = (ponto: PontoCasinha, distanceOffsetMeters: number = 15) => {
-    // 1 metro ~ 0.00000898 graus de latitude
-    const offset = distanceOffsetMeters * 0.00000898;
-    setUserCoords({
-      latitude: ponto.latitude + offset,
-      longitude: ponto.longitude,
-      accuracy: 5,
-    });
-    setSelectedPontoId(ponto.id);
-    setBannerNotice({
-      tipo: 'sucesso',
-      mensagem: `GPS simulado posicionado a ~${distanceOffsetMeters}m de '${ponto.nome_ponto}'. Raio <50m satisfeito!`,
-    });
-  };
-
-  // Sucesso de Check-in / Atendimento com Foto em Tempo Real
-  const handleCheckInSuccess = (updatedPonto: PontoCasinha, apiResponse: ApiResponse<PontoCasinha>) => {
-    const previousPonto = pontos.find((p) => p.id === updatedPonto.id);
-    const wasVermelho = previousPonto?.status === '🔴 Vermelho';
-
-    setPontos((prev) => prev.map((p) => (p.id === updatedPonto.id ? updatedPonto : p)));
-    setCheckInTarget(null);
-
-    const logItem: LogAcao = {
-      id: `checkin_${Date.now()}`,
-      ponto_id: updatedPonto.id,
-      nome_ponto: updatedPonto.nome_ponto,
-      acao: updatedPonto.ultimo_atendimento_tipo === 'reparo_vandalismo'
-        ? 'Reparo de danos/vandalismo concluído com foto da câmera (<50m)'
-        : 'Atendimento presencial comprovado com foto da câmera (<50m)',
-      timestamp: apiResponse.timestamp,
-      distancia_metros: apiResponse.erro ? undefined : 14.2,
-      status_anterior: wasVermelho ? '🔴 Vermelho' : '🟡 Amarelo',
-      status_novo: '🟢 Verde',
-      foto_anexada: true,
-    };
-    setLogs((prev) => [logItem, ...prev]);
-
-    setBannerNotice({
-      tipo: 'sucesso',
-      mensagem: wasVermelho
-        ? `✅ Reparo de vandalismo e urgência concluídos em '${updatedPonto.nome_ponto}' com foto da câmera ao vivo! Status restaurado para 🟢 Verde.`
-        : `✅ Atendimento confirmado no ponto '${updatedPonto.nome_ponto}' com foto em tempo real da câmera! Status atualizado para 🟢 Verde.`,
-    });
-  };
-
-  // Sucesso de Reporte de Urgência
-  const handleUrgencySuccess = (
-    updatedPonto: PontoCasinha,
-    apiResponse: ApiResponse<PontoCasinha>,
-    whatsappLink?: string
-  ) => {
-    setPontos((prev) => prev.map((p) => (p.id === updatedPonto.id ? updatedPonto : p)));
-    setUrgencyTarget(null);
-
-    const logItem: LogAcao = {
-      id: `urgencia_${Date.now()}`,
-      ponto_id: updatedPonto.id,
-      nome_ponto: updatedPonto.nome_ponto,
-      acao: `Alerta de Urgência com Foto: ${updatedPonto.motivo_urgencia || 'Dano físico'}`,
-      timestamp: apiResponse.timestamp,
-      status_anterior: '🟢 Verde',
-      status_novo: '🔴 Vermelho',
-      foto_anexada: true,
-    };
-    setLogs((prev) => [logItem, ...prev]);
-
-    setBannerNotice({
-      tipo: 'erro',
-      mensagem: `🚨 Alerta de Urgência publicado para '${updatedPonto.nome_ponto}'! Evidência visual arquivada e canal SOS WhatsApp ativado.`,
-    });
-  };
-
-  // Adiciona novo ponto ao banco de dados
-  const handleAddPoint = (novoPonto: PontoCasinha) => {
-    setPontos((prev) => [...prev, novoPonto]);
-    setBannerNotice({
-      tipo: 'sucesso',
-      mensagem: `Novo ponto '${novoPonto.nome_ponto}' registrado no banco de dados com ID #${novoPonto.id}!`,
-    });
-  };
-
-  // Testador simulado do console API
-  const handleSimulateApiCheckIn = (
-    pontoId: number,
-    simulatedDistanceMeters: number,
-    withPhoto: boolean = true
-  ) => {
-    const ponto = pontos.find((p) => p.id === pontoId) || pontos[0];
-    if (!ponto) return;
-
-    // Calcula coordenadas para dar a distância exata
-    const offset = simulatedDistanceMeters * 0.00000898;
-    const testCoords = {
-      latitude: ponto.latitude + offset,
-      longitude: ponto.longitude,
-    };
-
-    const res = processCheckIn(
-      ponto,
-      {
-        ponto_id: ponto.id,
-        tipo_acao: ponto.status === '🔴 Vermelho' ? 'reparo_vandalismo' : 'abastecimento',
-        user_latitude: testCoords.latitude,
-        user_longitude: testCoords.longitude,
-        foto_comprovante_camera: withPhoto
-          ? 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="400" height="300" fill="%23059669"/><text x="20" y="50" fill="white" font-size="16">FOTO AO VIVO CAMERA TESTE</text></svg>'
-          : '',
-        foto_timestamp: formatDateTime(currentSimulatedTime),
-      },
-      currentSimulatedTime
-    );
-
-    if (res.success && res.updatedCasinha) {
-      setPontos((prev) => prev.map((p) => (p.id === res.updatedCasinha!.id ? res.updatedCasinha! : p)));
-      if (res.log) setLogs((prev) => [res.log!, ...prev]);
-      setBannerNotice({
-        tipo: 'sucesso',
-        mensagem: `Simulação API: Atendimento a ${simulatedDistanceMeters}m com foto da câmera aprovado (HTTP 200). Status atualizado para 🟢 Verde.`,
-      });
-    } else {
-      const errDetail =
-        res.response.erro?.codigo === 'PHOTO_EVIDENCE_REQUIRED'
-          ? 'PHOTO_EVIDENCE_REQUIRED (Foto da câmera em tempo real obrigatória)'
-          : 'GPS_OUT_OF_RANGE (Distância excedeu 50m)';
-      setBannerNotice({
-        tipo: 'erro',
-        mensagem: `Simulação API: Operação rejeitada (${errDetail} - HTTP ${res.response.codigo_status}).`,
-      });
-    }
-  };
-
-  // Handlers da Oficina de Casinhas (João Pessoa - PB)
-  const handleAdicionarDoacao = (payload: DoacaoMaterialPayload) => {
-    const matAlvo = materiais.find((m) => m.id === payload.material_id);
-    const nomeMaterial = matAlvo?.nome || 'Insumo';
-    const unidade = matAlvo?.unidade || 'un';
-
-    setMateriais((prev) =>
-      prev.map((m) => {
-        if (m.id === payload.material_id) {
-          return {
-            ...m,
-            quantidade_atual: Number((m.quantidade_atual + payload.quantidade).toFixed(1)),
-            ultimo_doador: payload.doador_nome,
-          };
-        }
-        return m;
-      })
-    );
-
-    const novoLog: LogAcao = {
-      id: `doacao_${Date.now()}`,
-      ponto_id: 0,
-      nome_ponto: 'Oficina Central (João Pessoa)',
-      acao: `Entrada de doação: +${payload.quantidade} ${unidade} de ${nomeMaterial} (${payload.doador_nome})`,
-      timestamp: formatDateTime(currentSimulatedTime),
-      status_anterior: '🟢 Verde',
-      status_novo: '🟢 Verde',
-    };
-    setLogs((prev) => [novoLog, ...prev]);
-
-    setBannerNotice({
-      tipo: 'sucesso',
-      mensagem: `Doação registrada com sucesso! Adicionado +${payload.quantidade} ${unidade} de ${nomeMaterial} ao estoque comunitário (Doador: ${payload.doador_nome}).`,
-    });
-  };
-
-  const handleConcluirFabricacao = (
-    previsaoId: string,
-    voluntarioNome: string,
-    observacao: string
-  ) => {
-    // 1. Deduzir insumos necessários do estoque
-    setMateriais((prev) =>
-      prev.map((m) => ({
-        ...m,
-        quantidade_atual: Math.max(
-          0,
-          Number((m.quantidade_atual - m.consumo_por_casinha).toFixed(1))
-        ),
-      }))
-    );
-
-    // 2. Atualizar status da casinha para 'pronta'
-    let casinhaNome = '';
-    setPrevisoesCasinhas((prev) =>
-      prev.map((cas) => {
-        if (cas.id === previsaoId) {
-          casinhaNome = `Casinha #${cas.numero_casinha} (${cas.bairro})`;
-          return {
-            ...cas,
-            status: 'pronta',
-            voluntario_responsavel: voluntarioNome,
-            data_fabricacao: formatDateTime(currentSimulatedTime).split(' ')[0],
-            observacao: observacao || cas.observacao,
-          };
-        }
-        return cas;
-      })
-    );
-
-    const novoLog: LogAcao = {
-      id: `fabricar_${Date.now()}`,
-      ponto_id: 0,
-      nome_ponto: 'Oficina Central (João Pessoa)',
-      acao: `Montagem concluída: ${casinhaNome} pronta para instalação! Responsável: ${voluntarioNome}. Insumos deduzidos do estoque.`,
-      timestamp: formatDateTime(currentSimulatedTime),
-      status_anterior: '🟢 Verde',
-      status_novo: '🟢 Verde',
-    };
-    setLogs((prev) => [novoLog, ...prev]);
-
-    setBannerNotice({
-      tipo: 'sucesso',
-      mensagem: `Parabéns! ${casinhaNome} foi finalizada com sucesso pelos voluntários e está pronta para transporte e instalação nos bairros de João Pessoa!`,
-    });
-  };
-
-  const handleAtualizarStatusCasinha = (
-    previsaoId: string,
-    novoStatus: StatusFabricacaoCasinha
-  ) => {
-    let casinhaNome = '';
-    setPrevisoesCasinhas((prev) =>
-      prev.map((cas) => {
-        if (cas.id === previsaoId) {
-          casinhaNome = `Casinha #${cas.numero_casinha} (${cas.bairro})`;
-          return { ...cas, status: novoStatus };
-        }
-        return cas;
-      })
-    );
-
-    const labelStatus = {
-      planejada: 'Planejada',
-      em_montagem: 'Em Montagem na Oficina',
-      pronta: 'Pronta para Instalação',
-      instalada: 'Instalada no Bairro',
-    }[novoStatus];
-
-    const novoLog: LogAcao = {
-      id: `status_casinha_${Date.now()}`,
-      ponto_id: 0,
-      nome_ponto: 'Oficina Central (João Pessoa)',
-      acao: `Status de casinha atualizado: ${casinhaNome} alterada para [${labelStatus}]`,
-      timestamp: formatDateTime(currentSimulatedTime),
-      status_anterior: '🟢 Verde',
-      status_novo: '🟢 Verde',
-    };
-    setLogs((prev) => [novoLog, ...prev]);
-
-    setBannerNotice({
-      tipo: 'sucesso',
-      mensagem: `Status de ${casinhaNome} atualizado para "${labelStatus}".`,
-    });
-  };
-
-  // Filtragem e busca
-  const filteredPontos = pontos.filter((p) => {
-    const matchesFilter = activeFilter ? p.status === activeFilter : true;
-    const matchesSearch =
-      searchQuery.trim() === '' ||
-      p.nome_ponto.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.apoiador_logotipo.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.id.toString() === searchQuery.trim();
-
-    return matchesFilter && matchesSearch;
-  });
 
   return (
-    <div className="min-h-screen bg-stone-100 text-stone-900 flex flex-col font-sans selection:bg-emerald-200 selection:text-emerald-900">
-      
-      {/* Top Header & System Time & GPS Engine Controls */}
-      <Header
-        currentSimulatedTime={currentSimulatedTime}
-        onAdvanceHours={handleAdvanceHours}
-        onResetTime={handleResetTime}
-        onRunTTLScan={handleRunTTLScan}
-        ttlChangesCount={ttlChangesCount}
-        userCoords={userCoords}
-        gpsMode={gpsMode}
-        onToggleGpsMode={(mode) => setGpsMode(mode)}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        onOpenNewPointModal={() => setIsNewPointModalOpen(true)}
-      />
-
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        
-        {/* Banner de Notificação de Ações / Regras do Motor */}
-        {bannerNotice && (
-          <div
-            className={`mb-6 p-4 rounded-2xl border flex items-center justify-between gap-3 shadow-xs animate-in fade-in slide-in-from-top-2 duration-150 ${
-              bannerNotice.tipo === 'sucesso'
-                ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
-                : bannerNotice.tipo === 'aviso'
-                ? 'bg-amber-50 border-amber-200 text-amber-900'
-                : 'bg-red-50 border-red-200 text-red-900'
-            }`}
-          >
-            <div className="flex items-center gap-2.5 text-xs font-medium">
-              {bannerNotice.tipo === 'sucesso' && <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />}
-              {bannerNotice.tipo === 'aviso' && <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />}
-              {bannerNotice.tipo === 'erro' && <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />}
-              <span>{bannerNotice.mensagem}</span>
-            </div>
-            <button
-              onClick={() => setBannerNotice(null)}
-              className="text-stone-400 hover:text-stone-700 p-1 rounded-lg"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
+    <div className="min-h-screen bg-stone-50 text-slate-900 pb-24">
+      <header className="sticky top-0 z-30 border-b border-stone-200 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex max-w-md items-center gap-3 px-4 py-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-700 text-white"><PawPrint size={22}/></div>
+          <div className="min-w-0 flex-1">
+            <h1 className="truncate text-lg font-black text-emerald-950">Padrinhos de Rua</h1>
+            <p className="text-xs text-slate-500">Projeto-piloto • João Pessoa - PB</p>
           </div>
-        )}
+          <div className="rounded-xl bg-orange-50 px-2.5 py-1.5 text-right">
+            <div className="text-[10px] font-bold uppercase tracking-wide text-orange-700">Meta inicial</div>
+            <div className="text-sm font-black text-orange-800">10 casinhas</div>
+          </div>
+        </div>
+      </header>
 
-        {/* TAB 1: Painel Operacional */}
-        {activeTab === 'painel' && (
+      {toast && <div className="fixed left-1/2 top-20 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 rounded-2xl bg-emerald-950 px-4 py-3 text-sm font-semibold text-white shadow-xl">{toast}</div>}
+
+      <main className="mx-auto max-w-md space-y-4 px-4 py-4">
+        {tab === 'inicio' && (
           <>
-            {/* Banner de Contexto João Pessoa: Pontos de Comida instalados vs Fabricação de Casinhas */}
-            <div className="bg-linear-to-r from-emerald-900 to-teal-950 text-white rounded-2xl p-4 mb-6 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 border border-emerald-800/60">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center justify-center shrink-0">
-                  <Hammer className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-sm text-white">
-                      João Pessoa: {pontos.length} Pontos de Água e Comida Instalados
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-stone-950">
-                      Fase 2: Fabricação das Casinhas
-                    </span>
-                  </div>
-                  <p className="text-xs text-emerald-200/90 mt-0.5">
-                    Os comedouros estão ativos. Acesse a Oficina para acompanhar o estoque de materiais, ver o que está faltando para construir as casinhas e gerenciar o plano de distribuição.
-                  </p>
-                </div>
+            <section className="rounded-3xl bg-gradient-to-br from-emerald-800 to-teal-950 p-5 text-white shadow-sm">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-200">Fase inicial</p>
+              <h2 className="mt-1 text-3xl font-black">10 casinhas comunitárias</h2>
+              <p className="mt-2 text-sm leading-relaxed text-emerald-50">Água e comida já possuem pontos ativos. Agora o foco é construir abrigos simples com participação da comunidade.</p>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <button onClick={() => setTab('mapa')} className="rounded-2xl bg-white px-3 py-3 text-left text-emerald-950"><MapPin className="mb-1" size={20}/><span className="text-sm font-black">Ver pontos</span></button>
+                <button onClick={() => setTab('oficina')} className="rounded-2xl bg-orange-500 px-3 py-3 text-left text-white"><Hammer className="mb-1" size={20}/><span className="text-sm font-black">Fazer uma casinha</span></button>
               </div>
-              <button
-                id="btn-goto-oficina-banner"
-                onClick={() => setActiveTab('oficina')}
-                className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-bold text-xs rounded-xl flex items-center gap-1.5 shrink-0 transition-transform active:scale-95 shadow-xs cursor-pointer"
-              >
-                <span>Acessar Oficina de Casinhas</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
+            </section>
 
-            {/* Stats & Quick Semáforo Filters */}
-            <StatsBar
-              pontos={pontos}
-              activeFilter={activeFilter}
-              onFilterStatus={setActiveFilter}
-            />
+            <section className="grid grid-cols-2 gap-3">
+              <Kpi label="Instaladas" value={stats.instaladas} icon={<CheckCircle2/>}/>
+              <Kpi label="Em montagem" value={stats.montagem} icon={<Hammer/>}/>
+              <Kpi label="Prontas" value={stats.prontas} icon={<Home/>}/>
+              <Kpi label="Itens faltando" value={stats.faltando} icon={<Boxes/>}/>
+            </section>
 
-            {/* Interactive Geospatial Radar & Anti-fraud Map */}
-            <InteractiveMap
-              pontos={filteredPontos}
-              userCoords={userCoords}
-              onSetUserCoords={setUserCoords}
-              selectedPontoId={selectedPontoId}
-              onSelectPonto={(id) => setSelectedPontoId(id)}
-              onOpenCheckIn={(ponto) => setCheckInTarget(ponto)}
-              onOpenUrgency={(ponto) => setUrgencyTarget(ponto)}
-            />
-
-            {/* Search & Active Filters Toolbar */}
-            <div className="bg-white rounded-2xl border border-stone-200 p-4 mb-6 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="relative w-full sm:w-80">
-                <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Buscar por nome, apoiador ou ID..."
-                  className="w-full pl-9 pr-8 py-2 text-xs border border-stone-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
+            <section className="rounded-3xl border border-stone-200 bg-white p-4 shadow-sm">
+              <h3 className="font-black text-slate-900">Como ajudar agora</h3>
+              <div className="mt-3 space-y-2">
+                <Action title="Abastecer água ou comida" subtitle="Atualize um ponto próximo" icon={<HeartHandshake/>} onClick={() => setTab('mapa')}/>
+                <Action title="Doar materiais" subtitle="Veja exatamente o que está faltando" icon={<PackagePlus/>} onClick={() => setTab('estoque')}/>
+                <Action title="Participar da montagem" subtitle="Guia simples para voluntários" icon={<Wrench/>} onClick={() => setTab('oficina')}/>
               </div>
-
-              <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-                {activeFilter && (
-                  <button
-                    onClick={() => setActiveFilter(null)}
-                    className="px-2.5 py-1 text-xs bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-lg flex items-center gap-1 cursor-pointer"
-                  >
-                    <span>Filtro: {activeFilter}</span>
-                    <X className="w-3 h-3" />
-                  </button>
-                )}
-                <span className="text-xs text-stone-700">
-                  Mostrando <strong>{filteredPontos.length}</strong> de {pontos.length} pontos
-                </span>
-              </div>
-            </div>
-
-            {/* Points List */}
-            <PointsList
-              pontos={filteredPontos}
-              userCoords={userCoords}
-              currentSimulatedTime={currentSimulatedTime}
-              onOpenCheckIn={(ponto) => setCheckInTarget(ponto)}
-              onOpenUrgency={(ponto) => setUrgencyTarget(ponto)}
-              onSelectPonto={(id) => setSelectedPontoId(id)}
-              selectedPontoId={selectedPontoId}
-              onTeleportToPonto={(ponto, offset) => handleTeleport(ponto, offset)}
-              onInspectJson={(ponto) => setInspectJsonTarget(ponto)}
-            />
+            </section>
           </>
         )}
 
-        {/* TAB 2: Oficina Comunitária de Fabricação de Casinhas (João Pessoa) */}
-        {activeTab === 'oficina' && (
-          <OficinaCasinhas
-            materiais={materiais}
-            previsoes={previsoesCasinhas}
-            metaCasinhas={META_CASINHAS_JOAO_PESSOA}
-            onAdicionarDoacao={handleAdicionarDoacao}
-            onConcluirFabricacao={handleConcluirFabricacao}
-            onAtualizarStatusCasinha={handleAtualizarStatusCasinha}
-          />
+        {tab === 'mapa' && (
+          <>
+            <section>
+              <h2 className="text-2xl font-black text-emerald-950">Mapa de pontos</h2>
+              <p className="text-sm text-slate-500">Pontos comunitários de água, comida e abrigo.</p>
+              <div className="mt-3 flex items-center gap-2 rounded-2xl border border-stone-200 bg-white px-3 py-2.5 shadow-sm"><Search size={18} className="text-slate-400"/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Buscar por bairro ou ponto" className="w-full bg-transparent text-sm outline-none"/></div>
+            </section>
+            <div className="rounded-3xl border border-emerald-100 bg-emerald-50 p-4">
+              <div className="flex h-44 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-100 via-emerald-100 to-blue-100 text-center text-sm font-semibold text-slate-600"><Map className="mr-2"/> Área do mapa interativo<br/>com geolocalização</div>
+            </div>
+            <section className="space-y-2">
+              {filteredPoints.map(p => <PointCard key={p.id} point={p} onReport={() => notify(`Alerta do ponto “${p.nome}” preparado para envio.`)}/>) }
+            </section>
+          </>
         )}
 
-        {/* TAB 3: Console API & JSON Estrito */}
-        {activeTab === 'api' && (
-          <ApiConsole
-            pontos={pontos}
-            logs={logs}
-            userCoords={userCoords}
-            currentSimulatedTime={currentSimulatedTime}
-            onRunTTLScan={handleRunTTLScan}
-            onSimulateCheckInApi={handleSimulateApiCheckIn}
-          />
+        {tab === 'oficina' && (
+          <>
+            <section className="rounded-3xl bg-emerald-950 p-5 text-white">
+              <div className="flex items-center justify-between"><div><p className="text-xs uppercase tracking-widest text-emerald-300">Oficina comunitária</p><h2 className="text-2xl font-black">Quero fazer uma casinha</h2></div><Hammer size={34} className="text-orange-400"/></div>
+              <p className="mt-2 text-sm text-emerald-100">Modelo básico, fácil de reproduzir e pensado para mutirões comunitários.</p>
+            </section>
+            <section className="rounded-3xl border border-stone-200 bg-white p-4 shadow-sm">
+              <h3 className="font-black">Passo a passo simples</h3>
+              <div className="mt-3 space-y-3">
+                <Step n="1" title="Planejar" text="Escolha uma das 10 casinhas previstas e confirme o local autorizado."/>
+                <Step n="2" title="Separar materiais" text="Madeira/pallet, cobertura, parafusos, pés e piso lavável."/>
+                <Step n="3" title="Montar" text="Base elevada, paredes, entrada ampla e telhado inclinado com beiral."/>
+                <Step n="4" title="Registrar" text="Informe a conclusão para atualizar estoque e distribuição."/>
+              </div>
+              <button onClick={startNextHouse} className="mt-4 w-full rounded-2xl bg-orange-500 px-4 py-3 font-black text-white">Quero iniciar uma montagem</button>
+            </section>
+            <section className="rounded-3xl border border-stone-200 bg-white p-4">
+              <h3 className="font-black">As 10 casinhas</h3>
+              <div className="mt-3 space-y-2">{casinhas.map(c => <div key={c.id} className="flex items-center justify-between rounded-2xl bg-stone-50 p-3"><div><div className="text-sm font-bold">#{c.numero_casinha} • {c.bairro}</div><div className="text-xs text-slate-500">{c.local_referencia}</div></div><StatusBadge status={c.status}/></div>)}</div>
+            </section>
+          </>
         )}
 
+        {tab === 'estoque' && (
+          <>
+            <section><h2 className="text-2xl font-black text-emerald-950">Estoque de materiais</h2><p className="text-sm text-slate-500">Controle simples: temos, precisamos e o que ainda falta.</p></section>
+            <section className="grid grid-cols-3 gap-2">
+              <Mini label="Meta" value="10"/>
+              <Mini label="Montáveis agora" value={String(stats.capacidade)}/>
+              <Mini label="Itens faltando" value={String(stats.faltando)}/>
+            </section>
+            <section className="space-y-2">
+              {materiais.map(m => {
+                const necessario = m.consumo_por_casinha * META_CASINHAS_JOAO_PESSOA;
+                const falta = Math.max(0, necessario - m.quantidade_atual);
+                const pct = Math.min(100, Math.round((m.quantidade_atual / necessario) * 100));
+                return <div key={m.id} className="rounded-3xl border border-stone-200 bg-white p-4 shadow-sm"><div className="flex justify-between gap-3"><div><h3 className="text-sm font-black">{m.nome}</h3><p className="text-xs text-slate-500">{m.quantidade_atual} {m.unidade} disponíveis • meta: {necessario}</p></div><span className={`h-fit rounded-full px-2.5 py-1 text-xs font-bold ${falta ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-700'}`}>{falta ? `Faltam ${falta}` : 'Completo'}</span></div><div className="mt-3 h-2 overflow-hidden rounded-full bg-stone-100"><div className="h-full rounded-full bg-emerald-600" style={{width: `${pct}%`}}/></div><button onClick={() => registerDonation(m)} className="mt-3 text-xs font-black text-emerald-700">+ Registrar 1 {m.unidade} doado</button></div>
+              })}
+            </section>
+          </>
+        )}
+
+        {tab === 'perfil' && (
+          <>
+            <section className="rounded-3xl bg-gradient-to-br from-emerald-50 to-teal-100 p-5">
+              <div className="flex items-center gap-3"><div className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-emerald-800"><User size={30}/></div><div><p className="text-xs font-bold uppercase tracking-wider text-emerald-700">Perfil</p><h2 className="text-xl font-black">Voluntário(a)</h2><p className="text-sm text-slate-600">João Pessoa - PB</p></div></div>
+            </section>
+            <section className="rounded-3xl border border-stone-200 bg-white p-4 shadow-sm">
+              <h3 className="font-black">Minhas contribuições</h3>
+              <div className="mt-3 grid grid-cols-3 gap-2 text-center"><Mini label="Pontos" value="2"/><Mini label="Doações" value="1"/><Mini label="Montagens" value="1"/></div>
+              <p className="mt-4 text-sm text-slate-500">Nesta fase piloto, o perfil é propositalmente simples. O foco é facilitar a participação, não criar uma rede social complexa.</p>
+            </section>
+          </>
+        )}
       </main>
 
-      {/* Modais do Sistema */}
-      <CheckInModal
-        ponto={checkInTarget}
-        userCoords={userCoords}
-        currentSimulatedTime={currentSimulatedTime}
-        onClose={() => setCheckInTarget(null)}
-        onSuccess={handleCheckInSuccess}
-        onSetUserCoords={setUserCoords}
-      />
-
-      <UrgencyModal
-        ponto={urgencyTarget}
-        currentSimulatedTime={currentSimulatedTime}
-        onClose={() => setUrgencyTarget(null)}
-        onSuccess={handleUrgencySuccess}
-      />
-
-      <NewPointModal
-        isOpen={isNewPointModalOpen}
-        onClose={() => setIsNewPointModalOpen(false)}
-        onAddPoint={handleAddPoint}
-        userCoords={userCoords}
-        nextId={pontos.length > 0 ? Math.max(...pontos.map((p) => p.id)) + 1 : 1}
-      />
-
-      <JsonInspectorModal
-        ponto={inspectJsonTarget}
-        onClose={() => setInspectJsonTarget(null)}
-      />
-
-      {/* Offline Status Warning & Cache Banner */}
-      <OfflineIndicator />
-
-      {/* Simple Footer */}
-      <footer className="mt-12 py-6 border-t border-stone-200 bg-white text-center text-xs text-stone-700">
-        <p className="font-medium text-stone-800">
-          Padrinhos de Rua • Motor de Lógica e Banco de Dados Central
-        </p>
-        <p className="text-[11px] text-stone-700 mt-1">
-          Validação Anti-Fraude GPS (&lt;50m) • Lógica de TTL (48 horas) • Validação de Evidência Fotográfica • Despacho WhatsApp SOS
-        </p>
-      </footer>
-
+      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-stone-200 bg-white/95 backdrop-blur">
+        <div className="mx-auto grid max-w-md grid-cols-5 px-2 py-2">
+          <NavItem active={tab==='inicio'} icon={<Home/>} label="Início" onClick={() => setTab('inicio')}/>
+          <NavItem active={tab==='mapa'} icon={<Map/>} label="Mapa" onClick={() => setTab('mapa')}/>
+          <NavItem active={tab==='oficina'} icon={<Hammer/>} label="Oficina" onClick={() => setTab('oficina')}/>
+          <NavItem active={tab==='estoque'} icon={<Boxes/>} label="Estoque" onClick={() => setTab('estoque')}/>
+          <NavItem active={tab==='perfil'} icon={<User/>} label="Perfil" onClick={() => setTab('perfil')}/>
+        </div>
+      </nav>
     </div>
   );
 }
+
+function Kpi({label, value, icon}:{label:string;value:number;icon:React.ReactElement}) { return <div className="rounded-3xl border border-stone-200 bg-white p-4 shadow-sm"><div className="mb-2 text-emerald-700">{icon}</div><div className="text-2xl font-black">{value}</div><div className="text-xs font-semibold text-slate-500">{label}</div></div> }
+function Mini({label,value}:{label:string;value:string}) { return <div className="rounded-2xl bg-stone-50 p-3"><div className="text-xl font-black text-emerald-950">{value}</div><div className="text-[11px] font-semibold text-slate-500">{label}</div></div> }
+function Action({title,subtitle,icon,onClick}:{title:string;subtitle:string;icon:React.ReactElement;onClick:()=>void}) { return <button onClick={onClick} className="flex w-full items-center gap-3 rounded-2xl bg-stone-50 p-3 text-left"><div className="text-emerald-700">{icon}</div><div className="flex-1"><div className="text-sm font-black">{title}</div><div className="text-xs text-slate-500">{subtitle}</div></div><ChevronRight size={18}/></button> }
+function Step({n,title,text}:{n:string;title:string;text:string}) { return <div className="flex gap-3"><div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-700 text-sm font-black text-white">{n}</div><div><div className="text-sm font-black">{title}</div><p className="text-xs leading-relaxed text-slate-500">{text}</p></div></div> }
+function StatusBadge({status}:{status:string}) { const cls = status==='instalada'?'bg-emerald-100 text-emerald-800':status==='pronta'?'bg-blue-100 text-blue-800':status==='em_montagem'?'bg-amber-100 text-amber-800':'bg-stone-200 text-stone-700'; return <span className={`rounded-full px-2 py-1 text-[10px] font-bold ${cls}`}>{status.replace('_',' ')}</span> }
+function PointCard({point,onReport}:{point:Point;onReport:()=>void}) { return <article className="rounded-3xl border border-stone-200 bg-white p-4 shadow-sm"><div className="flex items-start justify-between gap-3"><div><h3 className="font-black">{point.nome}</h3><p className="text-xs text-slate-500">{point.bairro} • {point.distancia}</p></div><MapPin className="text-emerald-700" size={20}/></div><div className="mt-3 grid grid-cols-3 gap-2 text-center text-[11px]"><div className="rounded-xl bg-orange-50 p-2"><Utensils size={15} className="mx-auto mb-1 text-orange-600"/>Comida {point.comida}</div><div className="rounded-xl bg-sky-50 p-2"><Droplets size={15} className="mx-auto mb-1 text-sky-600"/>Água {point.agua}</div><div className="rounded-xl bg-emerald-50 p-2"><Home size={15} className="mx-auto mb-1 text-emerald-700"/>{point.casinha}</div></div><button onClick={onReport} className="mt-3 flex items-center gap-2 text-xs font-black text-red-700"><AlertTriangle size={15}/>Reportar problema</button></article> }
+function NavItem({active,icon,label,onClick}:{active:boolean;icon:React.ReactElement;label:string;onClick:()=>void}) { return <button onClick={onClick} className={`flex flex-col items-center gap-1 rounded-xl py-1.5 text-[10px] font-bold ${active?'text-emerald-700':'text-slate-500'}`}>{React.cloneElement(icon,{size:20} as any)}<span>{label}</span></button> }
+
+export default App;
