@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Background rounded rect -->
+  <rect width="512" height="512" rx="108" fill="url(#bgGrad)"/>
+
+  <g filter="url(#dropShadow)">
+    <!-- House Roof -->
+    <path d="M256 100 L110 230 L150 230 L150 370 C150 385 162 396 178 396 L334 396 C350 396 362 385 362 370 L362 230 L402 230 Z" fill="#ffffff"/>
+
+    <!-- Shelter Entrance / Arch -->
+    <path d="M220 396 L220 300 C220 280 236 264 256 264 C276 264 292 280 292 300 L292 396 Z" fill="#047857"/>
+
+    <!-- Heart / Paw Print inside the house -->
+    <!-- Main pad -->
+    <ellipse cx="256" cy="205" rx="34" ry="26" fill="#f59e0b"/>
+    <!-- 4 Toe pads -->
+    <ellipse cx="222" cy="165" rx="13" ry="17" transform="rotate(-20 222 165)" fill="#f59e0b"/>
+    <ellipse cx="245" cy="150" rx="12" ry="18" fill="#f59e0b"/>
+    <ellipse cx="267" cy="150" rx="12" ry="18" fill="#f59e0b"/>
+    <ellipse cx="290" cy="165" rx="13" ry="17" transform="rotate(20 290 165)" fill="#f59e0b"/>
+  </g>
+
+  <!-- Subtitle Tag -->
+  <rect x="136" y="420" width="240" height="42" rx="21" fill="#ffffff" fill-opacity="0.95"/>
+  <text x="256" y="447" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="900" fill="#047857" text-anchor="middle" letter-spacing="1">PADRINHOS</text>
+</svg>

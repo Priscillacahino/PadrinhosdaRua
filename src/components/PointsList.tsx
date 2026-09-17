@@ -12,7 +12,10 @@ import {
   Sparkles,
   Navigation,
   Image as ImageIcon,
-  Share2
+  Share2,
+  Camera,
+  Download,
+  Wrench
 } from 'lucide-react';
 import { PontoCasinha, GPSCoords } from '../types';
 import { calculateDistanceMeters, formatDistance, getTTLStatus } from '../utils/geo';
@@ -286,9 +289,41 @@ export const PointsList: React.FC<PointsListProps> = ({
                 )}
               </AnimatePresence>
 
+              {/* Comprovante do Último Atendimento (Câmera ao Vivo) */}
+              {ponto.ultima_foto_comprovante && (
+                <div className="mb-3 p-2.5 bg-emerald-50/80 border border-emerald-200 rounded-xl text-xs flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 overflow-hidden">
+                    <img
+                      src={ponto.ultima_foto_comprovante}
+                      alt="Comprovante de atendimento"
+                      className="w-10 h-10 rounded-lg object-cover border border-emerald-300 shrink-0 shadow-xs"
+                    />
+                    <div className="min-w-0">
+                      <span className="font-semibold text-emerald-950 block truncate flex items-center gap-1 text-[11px]">
+                        <Camera className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        Atendimento Comprovado ao Vivo
+                      </span>
+                      <span className="text-[10px] text-emerald-700 block truncate font-mono">
+                        {ponto.ultima_foto_timestamp || ponto.ultimo_check_in}
+                      </span>
+                    </div>
+                  </div>
+                  <a
+                    href={ponto.ultima_foto_comprovante}
+                    download={`comprovante_casinha_${ponto.id}.jpg`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="px-2 py-1 bg-white hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-lg text-[10px] font-semibold shrink-0 flex items-center gap-1 transition-colors shadow-2xs"
+                    title="Baixar comprovante fotográfico"
+                  >
+                    <Download className="w-3 h-3" />
+                    Baixar
+                  </a>
+                </div>
+              )}
+
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-stone-100">
-                {/* Check-in Button */}
+                {/* Check-in / Atendimento Button */}
                 <button
                   id={`btn-checkin-${ponto.id}`}
                   onClick={(e) => {
@@ -296,18 +331,22 @@ export const PointsList: React.FC<PointsListProps> = ({
                     onOpenCheckIn(ponto);
                   }}
                   className={`flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                    isNear
+                    isVermelho
+                      ? 'bg-red-600 hover:bg-red-500 text-white shadow-xs'
+                      : isNear
                       ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-xs'
                       : 'bg-stone-100 hover:bg-stone-200 text-stone-700'
                   }`}
                   title={
-                    isNear
-                      ? 'Proximidade validada (<50m)! Pronto para check-in.'
-                      : 'Distância >50m. Clique para abrir o validador com diagnóstico anti-fraude.'
+                    isVermelho
+                      ? 'Atender urgência e realizar reparo com envio obrigatório de foto da câmera do celular.'
+                      : isNear
+                      ? 'Proximidade validada (<50m)! Fotografe com a câmera para concluir check-in.'
+                      : 'Distância >50m. Abra para simular ou aproximar-se da casinha.'
                   }
                 >
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Check-in</span>
+                  {isVermelho ? <Wrench className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
+                  <span>{isVermelho ? 'Atender Reparo (Foto)' : 'Atender (Foto Obrigatória)'}</span>
                   {!isNear && <span className="text-[10px] text-stone-500 font-normal">(&gt;50m)</span>}
                 </button>
 

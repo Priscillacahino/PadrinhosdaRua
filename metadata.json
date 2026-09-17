@@ -1,7 +1,8 @@
 {
   "name": "Padrinhos de Rua - Motor & Gestão de Casinhas",
-  "description": "Motor de lógica e banco de dados central do aplicativo comunitário Padrinhos de Rua com validação GPS (<50m), TTL de 48h, evidência fotográfica e alertas via WhatsApp.",
+  "description": "Motor comunitário em João Pessoa (PB): monitoramento de pontos de água e comida com GPS (<50m), TTL de 48h, e Oficina Comunitária com controle de estoque de materiais, cálculo de déficit e plano de fabricação e distribuição de casinhas.",
   "requestFramePermissions": [
+    "camera",
     "geolocation"
   ],
   "majorCapabilities": [

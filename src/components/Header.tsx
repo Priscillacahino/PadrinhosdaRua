@@ -7,10 +7,12 @@ import {
   FastForward,
   Code2,
   SlidersHorizontal,
-  Plus
+  Plus,
+  Hammer
 } from 'lucide-react';
 import { formatDateTime } from '../utils/geo';
 import { GPSCoords } from '../types';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface HeaderProps {
   currentSimulatedTime: Date;
@@ -21,8 +23,8 @@ interface HeaderProps {
   userCoords: GPSCoords;
   onToggleGpsMode: (mode: 'real' | 'simulated') => void;
   gpsMode: 'real' | 'simulated';
-  activeTab: 'painel' | 'api';
-  setActiveTab: (tab: 'painel' | 'api') => void;
+  activeTab: 'painel' | 'oficina' | 'api';
+  setActiveTab: (tab: 'painel' | 'oficina' | 'api') => void;
   onOpenNewPointModal: () => void;
 }
 
@@ -80,7 +82,19 @@ export const Header: React.FC<HeaderProps> = ({
                     : 'text-stone-600 hover:text-stone-900'
                 }`}
               >
-                Painel Operacional
+                Pontos de Água & Comida
+              </button>
+              <button
+                id="tab-oficina-btn"
+                onClick={() => setActiveTab('oficina')}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all ${
+                  activeTab === 'oficina'
+                    ? 'bg-white text-emerald-900 shadow-xs font-bold'
+                    : 'text-stone-600 hover:text-stone-900'
+                }`}
+              >
+                <Hammer className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Oficina de Casinhas (JP)</span>
               </button>
               <button
                 id="tab-api-btn"
@@ -92,9 +106,11 @@ export const Header: React.FC<HeaderProps> = ({
                 }`}
               >
                 <Code2 className="w-3.5 h-3.5" />
-                Console API & JSON Estrito
+                Console API
               </button>
             </div>
+
+            <PWAInstallButton />
 
             <button
               id="new-point-header-btn"

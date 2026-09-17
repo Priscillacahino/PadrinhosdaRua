@@ -56,23 +56,46 @@ export function processCheckIn(
     return { success: false, response: errorResponse };
   }
 
-  // 2. Operação Válida: Atualiza status para 🟢 Verde e define novo ultimo_check_in
+  // 2. Validação Estrita de Evidência Fotográfica em Tempo Real (Câmera Obrigatória)
+  // Requisito: Não pode ser aceita foto de galeria. Foto direta da câmera é obrigatória
+  // para concluir atendimento/reparos e alterar o status no sistema.
+  if (!request.foto_comprovante_camera || request.foto_comprovante_camera.trim() === '') {
+    const errorResponse: ApiResponse<PontoCasinha> = {
+      sucesso: false,
+      codigo_status: 422,
+      timestamp: timestampStr,
+      mensagem: `Operação rejeitada: Foto da câmera em tempo real obrigatória! O serviço não pode ser concluído nem o status alterado sem foto tirada no momento pelo celular. Fotos de galeria não são permitidas.`,
+      erro: {
+        codigo: 'PHOTO_EVIDENCE_REQUIRED',
+        detalhes: 'É obrigatório capturar uma foto em tempo real usando a câmera para comprovar o abastecimento ou reparos e concluir o atendimento.',
+      },
+    };
+
+    return { success: false, response: errorResponse };
+  }
+
+  // 3. Operação Válida: Atualiza status para 🟢 Verde e define novo ultimo_check_in
   const statusAnterior = casinha.status;
   const updatedCasinha: PontoCasinha = {
     ...casinha,
     status: '🟢 Verde',
     ultimo_check_in: timestampStr,
-    // Limpa estado de urgência se houver
+    // Limpa estado de urgência se houver (reparo de dano/vandalismo concluído com sucesso)
     foto_urgencia: undefined,
     motivo_urgencia: undefined,
+    ultima_foto_comprovante: request.foto_comprovante_camera,
+    ultima_foto_timestamp: request.foto_timestamp || timestampStr,
+    ultimo_atendimento_tipo: request.tipo_acao,
   };
 
   const actionName =
-    request.tipo_acao === 'abastecimento'
-      ? 'Abastecimento de comida e água'
+    request.tipo_acao === 'reparo_vandalismo'
+      ? 'Reparo de Danos/Vandalismo (Concluído com Foto)'
+      : request.tipo_acao === 'abastecimento'
+      ? 'Abastecimento de comida e água (Concluído com Foto)'
       : request.tipo_acao === 'limpeza'
-      ? 'Limpeza e higienização do ponto'
-      : 'Vistoria geral preventiva';
+      ? 'Limpeza e higienização do ponto (Concluído com Foto)'
+      : 'Vistoria geral preventiva (Concluído com Foto)';
 
   const log: LogAcao = {
     id: `log_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
@@ -83,13 +106,14 @@ export function processCheckIn(
     distancia_metros: distanceMeters,
     status_anterior: statusAnterior,
     status_novo: '🟢 Verde',
+    foto_anexada: true,
   };
 
   const successResponse: ApiResponse<PontoCasinha> = {
     sucesso: true,
     codigo_status: 200,
     timestamp: timestampStr,
-    mensagem: `Check-in realizado com sucesso! Ponto '${casinha.nome_ponto}' validado a ${distanceMeters}m de distância. Status atualizado para 🟢 Verde.`,
+    mensagem: `Atendimento concluído com sucesso! Ponto '${casinha.nome_ponto}' validado com foto da câmera em tempo real a ${distanceMeters}m de distância. Status atualizado para 🟢 Verde.`,
     dados: updatedCasinha,
   };
 

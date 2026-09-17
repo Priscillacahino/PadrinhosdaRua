@@ -8,8 +8,24 @@ import { UrgencyModal } from './components/UrgencyModal';
 import { NewPointModal } from './components/NewPointModal';
 import { JsonInspectorModal } from './components/JsonInspectorModal';
 import { ApiConsole } from './components/ApiConsole';
+import { OfflineIndicator } from './components/OfflineIndicator';
+import { OficinaCasinhas } from './components/OficinaCasinhas';
 import { INITIAL_PONTOS_CASINHAS, DEFAULT_USER_LOCATION } from './data/initialData';
-import { PontoCasinha, GPSCoords, LogAcao, ApiResponse } from './types';
+import {
+  INITIAL_MATERIAIS_ESTOQUE,
+  INITIAL_PREVISOES_CASINHAS,
+  META_CASINHAS_JOAO_PESSOA
+} from './data/oficinaData';
+import {
+  PontoCasinha,
+  GPSCoords,
+  LogAcao,
+  ApiResponse,
+  MaterialEstoque,
+  PrevisaoCasinhaBairro,
+  StatusFabricacaoCasinha,
+  DoacaoMaterialPayload
+} from './types';
 import { applyTTLLogic, processCheckIn } from './utils/engine';
 import { formatDateTime } from './utils/geo';
 import {
@@ -21,7 +37,9 @@ import {
   Info,
   ShieldCheck,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  Hammer,
+  ArrowRight
 } from 'lucide-react';
 
 export default function App() {
@@ -68,10 +86,14 @@ export default function App() {
   ]);
 
   // Filtros e Seleção
-  const [activeTab, setActiveTab] = useState<'painel' | 'api'>('painel');
+  const [activeTab, setActiveTab] = useState<'painel' | 'oficina' | 'api'>('painel');
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedPontoId, setSelectedPontoId] = useState<number | null>(null);
+
+  // Estado da Oficina Comunitária de Fabricação de Casinhas (João Pessoa - PB)
+  const [materiais, setMateriais] = useState<MaterialEstoque[]>(INITIAL_MATERIAIS_ESTOQUE);
+  const [previsoesCasinhas, setPrevisoesCasinhas] = useState<PrevisaoCasinhaBairro[]>(INITIAL_PREVISOES_CASINHAS);
 
   // Modais
   const [checkInTarget, setCheckInTarget] = useState<PontoCasinha | null>(null);
@@ -183,8 +205,11 @@ export default function App() {
     });
   };
 
-  // Sucesso de Check-in
+  // Sucesso de Check-in / Atendimento com Foto em Tempo Real
   const handleCheckInSuccess = (updatedPonto: PontoCasinha, apiResponse: ApiResponse<PontoCasinha>) => {
+    const previousPonto = pontos.find((p) => p.id === updatedPonto.id);
+    const wasVermelho = previousPonto?.status === '🔴 Vermelho';
+
     setPontos((prev) => prev.map((p) => (p.id === updatedPonto.id ? updatedPonto : p)));
     setCheckInTarget(null);
 
@@ -192,17 +217,22 @@ export default function App() {
       id: `checkin_${Date.now()}`,
       ponto_id: updatedPonto.id,
       nome_ponto: updatedPonto.nome_ponto,
-      acao: 'Check-in presencial validado (<50m)',
+      acao: updatedPonto.ultimo_atendimento_tipo === 'reparo_vandalismo'
+        ? 'Reparo de danos/vandalismo concluído com foto da câmera (<50m)'
+        : 'Atendimento presencial comprovado com foto da câmera (<50m)',
       timestamp: apiResponse.timestamp,
       distancia_metros: apiResponse.erro ? undefined : 14.2,
-      status_anterior: '🟡 Amarelo',
+      status_anterior: wasVermelho ? '🔴 Vermelho' : '🟡 Amarelo',
       status_novo: '🟢 Verde',
+      foto_anexada: true,
     };
     setLogs((prev) => [logItem, ...prev]);
 
     setBannerNotice({
       tipo: 'sucesso',
-      mensagem: `✅ Check-in confirmado no ponto '${updatedPonto.nome_ponto}'! Status restaurado para 🟢 Verde e relógio TTL resetado.`,
+      mensagem: wasVermelho
+        ? `✅ Reparo de vandalismo e urgência concluídos em '${updatedPonto.nome_ponto}' com foto da câmera ao vivo! Status restaurado para 🟢 Verde.`
+        : `✅ Atendimento confirmado no ponto '${updatedPonto.nome_ponto}' com foto em tempo real da câmera! Status atualizado para 🟢 Verde.`,
     });
   };
 
@@ -243,7 +273,11 @@ export default function App() {
   };
 
   // Testador simulado do console API
-  const handleSimulateApiCheckIn = (pontoId: number, simulatedDistanceMeters: number) => {
+  const handleSimulateApiCheckIn = (
+    pontoId: number,
+    simulatedDistanceMeters: number,
+    withPhoto: boolean = true
+  ) => {
     const ponto = pontos.find((p) => p.id === pontoId) || pontos[0];
     if (!ponto) return;
 
@@ -258,9 +292,13 @@ export default function App() {
       ponto,
       {
         ponto_id: ponto.id,
-        tipo_acao: 'abastecimento',
+        tipo_acao: ponto.status === '🔴 Vermelho' ? 'reparo_vandalismo' : 'abastecimento',
         user_latitude: testCoords.latitude,
         user_longitude: testCoords.longitude,
+        foto_comprovante_camera: withPhoto
+          ? 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="400" height="300" fill="%23059669"/><text x="20" y="50" fill="white" font-size="16">FOTO AO VIVO CAMERA TESTE</text></svg>'
+          : '',
+        foto_timestamp: formatDateTime(currentSimulatedTime),
       },
       currentSimulatedTime
     );
@@ -270,14 +308,144 @@ export default function App() {
       if (res.log) setLogs((prev) => [res.log!, ...prev]);
       setBannerNotice({
         tipo: 'sucesso',
-        mensagem: `Simulação API: Check-in a ${simulatedDistanceMeters}m aprovado (HTTP 200). Status: 🟢 Verde.`,
+        mensagem: `Simulação API: Atendimento a ${simulatedDistanceMeters}m com foto da câmera aprovado (HTTP 200). Status atualizado para 🟢 Verde.`,
       });
     } else {
+      const errDetail =
+        res.response.erro?.codigo === 'PHOTO_EVIDENCE_REQUIRED'
+          ? 'PHOTO_EVIDENCE_REQUIRED (Foto da câmera em tempo real obrigatória)'
+          : 'GPS_OUT_OF_RANGE (Distância excedeu 50m)';
       setBannerNotice({
         tipo: 'erro',
-        mensagem: `Simulação API: Check-in a ${simulatedDistanceMeters}m rejeitado (HTTP 403 - GPS_OUT_OF_RANGE).`,
+        mensagem: `Simulação API: Operação rejeitada (${errDetail} - HTTP ${res.response.codigo_status}).`,
       });
     }
+  };
+
+  // Handlers da Oficina de Casinhas (João Pessoa - PB)
+  const handleAdicionarDoacao = (payload: DoacaoMaterialPayload) => {
+    const matAlvo = materiais.find((m) => m.id === payload.material_id);
+    const nomeMaterial = matAlvo?.nome || 'Insumo';
+    const unidade = matAlvo?.unidade || 'un';
+
+    setMateriais((prev) =>
+      prev.map((m) => {
+        if (m.id === payload.material_id) {
+          return {
+            ...m,
+            quantidade_atual: Number((m.quantidade_atual + payload.quantidade).toFixed(1)),
+            ultimo_doador: payload.doador_nome,
+          };
+        }
+        return m;
+      })
+    );
+
+    const novoLog: LogAcao = {
+      id: `doacao_${Date.now()}`,
+      ponto_id: 0,
+      nome_ponto: 'Oficina Central (João Pessoa)',
+      acao: `Entrada de doação: +${payload.quantidade} ${unidade} de ${nomeMaterial} (${payload.doador_nome})`,
+      timestamp: formatDateTime(currentSimulatedTime),
+      status_anterior: '🟢 Verde',
+      status_novo: '🟢 Verde',
+    };
+    setLogs((prev) => [novoLog, ...prev]);
+
+    setBannerNotice({
+      tipo: 'sucesso',
+      mensagem: `Doação registrada com sucesso! Adicionado +${payload.quantidade} ${unidade} de ${nomeMaterial} ao estoque comunitário (Doador: ${payload.doador_nome}).`,
+    });
+  };
+
+  const handleConcluirFabricacao = (
+    previsaoId: string,
+    voluntarioNome: string,
+    observacao: string
+  ) => {
+    // 1. Deduzir insumos necessários do estoque
+    setMateriais((prev) =>
+      prev.map((m) => ({
+        ...m,
+        quantidade_atual: Math.max(
+          0,
+          Number((m.quantidade_atual - m.consumo_por_casinha).toFixed(1))
+        ),
+      }))
+    );
+
+    // 2. Atualizar status da casinha para 'pronta'
+    let casinhaNome = '';
+    setPrevisoesCasinhas((prev) =>
+      prev.map((cas) => {
+        if (cas.id === previsaoId) {
+          casinhaNome = `Casinha #${cas.numero_casinha} (${cas.bairro})`;
+          return {
+            ...cas,
+            status: 'pronta',
+            voluntario_responsavel: voluntarioNome,
+            data_fabricacao: formatDateTime(currentSimulatedTime).split(' ')[0],
+            observacao: observacao || cas.observacao,
+          };
+        }
+        return cas;
+      })
+    );
+
+    const novoLog: LogAcao = {
+      id: `fabricar_${Date.now()}`,
+      ponto_id: 0,
+      nome_ponto: 'Oficina Central (João Pessoa)',
+      acao: `Montagem concluída: ${casinhaNome} pronta para instalação! Responsável: ${voluntarioNome}. Insumos deduzidos do estoque.`,
+      timestamp: formatDateTime(currentSimulatedTime),
+      status_anterior: '🟢 Verde',
+      status_novo: '🟢 Verde',
+    };
+    setLogs((prev) => [novoLog, ...prev]);
+
+    setBannerNotice({
+      tipo: 'sucesso',
+      mensagem: `Parabéns! ${casinhaNome} foi finalizada com sucesso pelos voluntários e está pronta para transporte e instalação nos bairros de João Pessoa!`,
+    });
+  };
+
+  const handleAtualizarStatusCasinha = (
+    previsaoId: string,
+    novoStatus: StatusFabricacaoCasinha
+  ) => {
+    let casinhaNome = '';
+    setPrevisoesCasinhas((prev) =>
+      prev.map((cas) => {
+        if (cas.id === previsaoId) {
+          casinhaNome = `Casinha #${cas.numero_casinha} (${cas.bairro})`;
+          return { ...cas, status: novoStatus };
+        }
+        return cas;
+      })
+    );
+
+    const labelStatus = {
+      planejada: 'Planejada',
+      em_montagem: 'Em Montagem na Oficina',
+      pronta: 'Pronta para Instalação',
+      instalada: 'Instalada no Bairro',
+    }[novoStatus];
+
+    const novoLog: LogAcao = {
+      id: `status_casinha_${Date.now()}`,
+      ponto_id: 0,
+      nome_ponto: 'Oficina Central (João Pessoa)',
+      acao: `Status de casinha atualizado: ${casinhaNome} alterada para [${labelStatus}]`,
+      timestamp: formatDateTime(currentSimulatedTime),
+      status_anterior: '🟢 Verde',
+      status_novo: '🟢 Verde',
+    };
+    setLogs((prev) => [novoLog, ...prev]);
+
+    setBannerNotice({
+      tipo: 'sucesso',
+      mensagem: `Status de ${casinhaNome} atualizado para "${labelStatus}".`,
+    });
   };
 
   // Filtragem e busca
@@ -342,6 +510,36 @@ export default function App() {
         {/* TAB 1: Painel Operacional */}
         {activeTab === 'painel' && (
           <>
+            {/* Banner de Contexto João Pessoa: Pontos de Comida instalados vs Fabricação de Casinhas */}
+            <div className="bg-linear-to-r from-emerald-900 to-teal-950 text-white rounded-2xl p-4 mb-6 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 border border-emerald-800/60">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center justify-center shrink-0">
+                  <Hammer className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-sm text-white">
+                      João Pessoa: {pontos.length} Pontos de Água e Comida Instalados
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-stone-950">
+                      Fase 2: Fabricação das Casinhas
+                    </span>
+                  </div>
+                  <p className="text-xs text-emerald-200/90 mt-0.5">
+                    Os comedouros estão ativos. Acesse a Oficina para acompanhar o estoque de materiais, ver o que está faltando para construir as casinhas e gerenciar o plano de distribuição.
+                  </p>
+                </div>
+              </div>
+              <button
+                id="btn-goto-oficina-banner"
+                onClick={() => setActiveTab('oficina')}
+                className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-stone-950 font-bold text-xs rounded-xl flex items-center gap-1.5 shrink-0 transition-transform active:scale-95 shadow-xs cursor-pointer"
+              >
+                <span>Acessar Oficina de Casinhas</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+
             {/* Stats & Quick Semáforo Filters */}
             <StatsBar
               pontos={pontos}
@@ -412,7 +610,19 @@ export default function App() {
           </>
         )}
 
-        {/* TAB 2: Console API & JSON Estrito */}
+        {/* TAB 2: Oficina Comunitária de Fabricação de Casinhas (João Pessoa) */}
+        {activeTab === 'oficina' && (
+          <OficinaCasinhas
+            materiais={materiais}
+            previsoes={previsoesCasinhas}
+            metaCasinhas={META_CASINHAS_JOAO_PESSOA}
+            onAdicionarDoacao={handleAdicionarDoacao}
+            onConcluirFabricacao={handleConcluirFabricacao}
+            onAtualizarStatusCasinha={handleAtualizarStatusCasinha}
+          />
+        )}
+
+        {/* TAB 3: Console API & JSON Estrito */}
         {activeTab === 'api' && (
           <ApiConsole
             pontos={pontos}
@@ -455,6 +665,9 @@ export default function App() {
         ponto={inspectJsonTarget}
         onClose={() => setInspectJsonTarget(null)}
       />
+
+      {/* Offline Status Warning & Cache Banner */}
+      <OfflineIndicator />
 
       {/* Simple Footer */}
       <footer className="mt-12 py-6 border-t border-stone-200 bg-white text-center text-xs text-stone-700">

@@ -22,7 +22,7 @@ interface ApiConsoleProps {
   userCoords: GPSCoords;
   currentSimulatedTime: Date;
   onRunTTLScan: () => void;
-  onSimulateCheckInApi: (pontoId: number, simulatedDistanceMeters: number) => void;
+  onSimulateCheckInApi: (pontoId: number, simulatedDistanceMeters: number, withPhoto?: boolean) => void;
 }
 
 export const ApiConsole: React.FC<ApiConsoleProps> = ({
@@ -167,19 +167,19 @@ export const ApiConsole: React.FC<ApiConsoleProps> = ({
                 Dispare chamadas de API para verificar o comportamento das regras do motor:
               </p>
 
-              {/* Test Case 1: Valid Check-in (<50m) */}
+              {/* Test Case 1: Valid Check-in (<50m with Camera Photo) */}
               <button
                 id="api-test-valid-checkin"
-                onClick={() => onSimulateCheckInApi(1, 15)}
+                onClick={() => onSimulateCheckInApi(1, 15, true)}
                 className="w-full text-left p-3 rounded-xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-100/60 transition-colors flex items-start justify-between gap-2 cursor-pointer"
               >
                 <div>
                   <span className="font-bold text-emerald-900 block flex items-center gap-1">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                    POST /check-in (Sucesso &lt;50m)
+                    POST /check-in (Sucesso &lt;50m com Foto da Câmera)
                   </span>
                   <span className="text-[11px] text-emerald-700 block mt-0.5">
-                    Envia coordenadas a 15m da Casinha #1 (Parque da Lagoa - Centro). Deve retornar HTTP 200 e atualizar para 🟢 Verde.
+                    Envia coordenadas a 15m da Casinha #1 com foto em tempo real da câmera. Retorna HTTP 200 e atualiza status para 🟢 Verde.
                   </span>
                 </div>
                 <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-200 text-emerald-900">
@@ -187,10 +187,30 @@ export const ApiConsole: React.FC<ApiConsoleProps> = ({
                 </span>
               </button>
 
-              {/* Test Case 2: Anti-fraud rejection (>50m) */}
+              {/* Test Case 2: Missing Photo rejection (PHOTO_EVIDENCE_REQUIRED) */}
+              <button
+                id="api-test-no-photo-checkin"
+                onClick={() => onSimulateCheckInApi(1, 15, false)}
+                className="w-full text-left p-3 rounded-xl border border-orange-200 bg-orange-50/50 hover:bg-orange-100/60 transition-colors flex items-start justify-between gap-2 cursor-pointer"
+              >
+                <div>
+                  <span className="font-bold text-orange-900 block flex items-center gap-1">
+                    <AlertTriangle className="w-3.5 h-3.5 text-orange-600" />
+                    POST /check-in (Rejeição: Sem Foto da Câmera)
+                  </span>
+                  <span className="text-[11px] text-orange-700 block mt-0.5">
+                    Envia requisição presencial sem a foto da câmera. Bloqueia com HTTP 422 PHOTO_EVIDENCE_REQUIRED e não altera status.
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-orange-200 text-orange-900">
+                  TESTAR
+                </span>
+              </button>
+
+              {/* Test Case 3: Anti-fraud rejection (>50m) */}
               <button
                 id="api-test-invalid-checkin"
-                onClick={() => onSimulateCheckInApi(1, 145)}
+                onClick={() => onSimulateCheckInApi(1, 145, true)}
                 className="w-full text-left p-3 rounded-xl border border-red-200 bg-red-50/50 hover:bg-red-100/60 transition-colors flex items-start justify-between gap-2 cursor-pointer"
               >
                 <div>
