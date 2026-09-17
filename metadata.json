@@ -1,0 +1,11 @@
+{
+  "name": "Padrinhos de Rua - Motor & Gestão de Casinhas",
+  "description": "Motor de lógica e banco de dados central do aplicativo comunitário Padrinhos de Rua com validação GPS (<50m), TTL de 48h, evidência fotográfica e alertas via WhatsApp.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
+
