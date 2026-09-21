@@ -101,7 +101,34 @@ O código principal não utiliza IA, Express, chaves externas, câmera ou geoloc
 
 ## Protótipos
 
-O repositório possui 11 telas mobile produzidas ao longo da evolução do projeto. Elas são tratadas como protótipos acadêmicos/demonstrativos quando exibirem números ainda não validados. A organização e as regras de leitura estão descritas em [`prototipos/README.md`](./prototipos/README.md), incluindo a separação entre protótipo visual e funcionalidade efetivamente implementada.
+O repositório possui **11 telas mobile** produzidas ao longo da evolução do projeto. Elas são apresentadas abaixo como uma jornada visual do aplicativo.
+
+> **Importante:** estas telas são protótipos acadêmicos/demonstrativos. Valores, locais, quantidades, contribuições, pontos e demais informações exibidas nas imagens podem ser fictícios e não representam execução física, parceria, atendimento ou instalação já realizada.
+
+<table>
+  <tr>
+    <td align="center"><strong>1. Boas-vindas</strong><br><img src="./prototipos/mobile/tela_de_boas_vindas_padrinhos_de_rua.png" width="240" alt="Tela de boas-vindas do Padrinhos de Rua"></td>
+    <td align="center"><strong>2. Cadastro</strong><br><img src="./prototipos/mobile/tela_de_cadastro_padrinhos_de_rua.png" width="240" alt="Tela de cadastro do Padrinhos de Rua"></td>
+    <td align="center"><strong>3. Minhas contribuições</strong><br><img src="./prototipos/mobile/minhas_contribuicoes_pelos_animais.png" width="240" alt="Tela de contribuições do Padrinhos de Rua"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>4. Mapa de apoio animal</strong><br><img src="./prototipos/mobile/mapa_de_apoio_animal_em_joao_pessoa.png" width="240" alt="Mapa de apoio animal em João Pessoa"></td>
+    <td align="center"><strong>5. Detalhes do ponto</strong><br><img src="./prototipos/mobile/detalhes_do_ponto_no_parque_da_lagoa.png" width="240" alt="Detalhes de um ponto de apoio animal"></td>
+    <td align="center"><strong>6. Reporte</strong><br><img src="./prototipos/mobile/tela_de_reporte_padrinhos_de_rua.png" width="240" alt="Tela de reporte do Padrinhos de Rua"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>7. Estoque de materiais</strong><br><img src="./prototipos/mobile/estoque_de_materiais_para_abrigos.png" width="240" alt="Estoque de materiais para abrigos"></td>
+    <td align="center"><strong>8. Doação de materiais</strong><br><img src="./prototipos/mobile/tela_de_doacao_de_materiais_para_abrigos.png" width="240" alt="Tela de doação de materiais para abrigos"></td>
+    <td align="center"><strong>9. Planejamento da casinha</strong><br><img src="./prototipos/mobile/planeje_sua_casinha_de_abrigo.png" width="240" alt="Planejamento de casinha de abrigo"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>10. Produção e distribuição</strong><br><img src="./prototipos/mobile/producao_e_distribuicao_de_casinhas.png" width="240" alt="Produção e distribuição de casinhas"></td>
+    <td align="center"><strong>11. Perfil</strong><br><img src="./prototipos/mobile/tela_de_perfil_do_padrinhos_de_rua.png" width="240" alt="Tela de perfil do Padrinhos de Rua"></td>
+    <td align="center"><strong>Jornada visual do MVP</strong><br><br>As telas ajudam a demonstrar como o projeto evolui da entrada do usuário até o acompanhamento de pontos, materiais, produção e participação voluntária.</td>
+  </tr>
+</table>
+
+A organização detalhada, o status de cada tela e as regras de leitura estão descritos em [`prototipos/README.md`](./prototipos/README.md), incluindo a separação entre **protótipo visual**, **funcionalidade implementada**, **implementação parcial** e **evolução futura**.
 
 ## Documentação de apoio
 
