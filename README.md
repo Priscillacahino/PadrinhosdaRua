@@ -1,212 +1,146 @@
 # 🐾 Padrinhos de Rua
 
-> **Projeto de extensão do curso de Análise e Desenvolvimento de Sistemas (ADS) do UNIPÊ, com foco em tecnologia social aplicada ao bem-estar de animais comunitários em João Pessoa - PB.**
+> **Projeto de extensão de Análise e Desenvolvimento de Sistemas (ADS) do UNIPÊ, em fase de MVP acadêmico, que propõe tecnologia social para organizar o cuidado comunitário de animais em João Pessoa - PB.**
 
-## 🎯 Finalidade do projeto
+## Estado real do projeto
 
-O **Padrinhos de Rua** foi concebido para aproximar tecnologia, universidade e sociedade em uma ação prática de apoio a animais em situação de rua. O projeto parte de uma necessidade social concreta - animais expostos à fome, sede, chuva, calor, abandono e falta de acompanhamento contínuo - e propõe uma solução comunitária apoiada por tecnologia.
+**Nenhuma casinha está instalada no momento.** A fase atual é de planejamento, prototipação e validação do fluxo tecnológico. A meta piloto é de **até 10 casinhas**, condicionada a necessidade comprovada, materiais adequados, responsáveis de referência e autorização do local.
 
-A prioridade é **gerar impacto social**, organizando pontos de água e alimentação, voluntários, doações e a implantação gradual de abrigos comunitários. Por ser um projeto de extensão de **Análise e Desenvolvimento de Sistemas**, a solução também explora competências do curso, como levantamento de requisitos, UX/UI, desenvolvimento web mobile, PWA, organização de dados, controle de estoque, geolocalização, versionamento e evolução de software.
+Os pontos, quantidades de estoque e movimentações exibidos no MVP podem ser **dados demonstrativos**. Eles existem para testar a interface e não devem ser interpretados como execução física, parceria, doação ou atendimento real.
 
-## 🌱 Por que este projeto é importante?
+## Problema que o projeto procura enfrentar
 
-O abandono de animais é um problema socioambiental e de saúde pública. Animais comunitários dependem de moradores, comerciantes, protetores e voluntários para alimentação, água, proteção e encaminhamento de situações de risco. Sem organização, esses esforços podem ficar dispersos, ser interrompidos ou depender de poucas pessoas.
+Ações comunitárias de apoio a animais podem perder continuidade quando não há uma forma simples de acompanhar necessidades, responsáveis, reposição, manutenção, materiais e histórico. O Padrinhos de Rua propõe usar tecnologia para apoiar esse ciclo, sem substituir voluntários, protetores, instituições competentes ou atendimento veterinário.
 
-O projeto busca criar uma rede simples e escalável de colaboração, permitindo que a comunidade identifique pontos de apoio, acompanhe necessidades e contribua de forma objetiva. A tecnologia não substitui o cuidado humano: ela atua como ferramenta para **organizar, registrar, comunicar e dar continuidade** às ações.
+**Pergunta orientadora:** como a tecnologia pode ajudar uma rede voluntária a manter pontos comunitários de apoio animal organizados e acompanhados ao longo do tempo?
 
-## 🔎 Problemas identificados
+## Proposta
 
-- animais expostos ao sol, chuva, fome e sede;
-- pontos de água e comida que dependem de reposição frequente;
-- dificuldade de coordenar voluntários e responsáveis locais;
-- falta de visibilidade sobre materiais disponíveis e materiais faltantes;
-- risco de abandono dos pontos após o entusiasmo inicial;
-- vandalismo, furto ou desgaste das estruturas físicas;
-- necessidade de autorização para instalação em espaços públicos ou de terceiros;
-- necessidade de manutenção contínua das casinhas, comedouros e bebedouros;
-- necessidade de manutenção técnica do aplicativo e dos dados;
-- limitação de recursos e dependência inicial de doações e parcerias.
+O aplicativo é pensado como PWA/mobile first e organiza cinco frentes:
 
-## ✅ Objetivo geral
+- **Início:** situação do piloto, indicadores e formas de participação;
+- **Mapa:** visualização futura dos pontos e suas necessidades;
+- **Oficina:** planejamento das casinhas e etapas anteriores à instalação;
+- **Estoque:** materiais disponíveis, necessários e déficit;
+- **Perfil:** participação do voluntário e resultados comprovados.
 
-Desenvolver e validar uma solução de tecnologia social, em formato de aplicativo **mobile first/PWA**, que organize a colaboração comunitária em torno de pontos de água, alimentação e abrigo para animais comunitários em João Pessoa, integrando participação voluntária, acompanhamento dos pontos, controle simples de insumos e planejamento de casinhas comunitárias.
+### Jornada operacional
 
-## 🎯 Objetivos específicos
+`PONTO → NECESSIDADE → VOLUNTÁRIO → ATENDIMENTO → MANUTENÇÃO → REGISTRO → HISTÓRICO → INDICADORES`
 
-- mapear e organizar pontos comunitários de apoio;
-- facilitar o registro de necessidades e problemas;
-- apoiar a reposição de água e alimento;
-- organizar voluntários e contribuições;
-- controlar materiais disponíveis e faltantes para construção das casinhas;
-- disponibilizar um guia simples para que voluntários possam participar da montagem;
-- acompanhar a construção e distribuição das casinhas;
-- manter uma meta inicial realista de **até 10 casinhas** na fase piloto;
-- documentar o projeto de forma que possa evoluir em novas turmas, projetos de extensão ou parcerias;
-- aplicar conhecimentos de ADS em um problema social real.
+O diferencial pretendido não é apenas criar casinhas ou um aplicativo, mas organizar a **continuidade do cuidado**.
 
-## 📱 Como funciona?
+## Separação entre planejamento e realidade
 
-O aplicativo foi redesenhado para uma experiência **mobile first**, com navegação simples em cinco áreas principais:
+| Categoria | Significado |
+|---|---|
+| **Real/validado** | atividade de campo comprovada e autorizada |
+| **Planejado** | intenção do piloto ainda não executada |
+| **Demonstrativo** | dado fictício usado exclusivamente para testar o MVP |
 
-1. **Início** - apresenta o status do projeto e formas rápidas de ajudar.
-2. **Mapa** - organiza os pontos comunitários de água, comida e abrigo.
-3. **Oficina** - mostra o passo a passo básico de uma casinha e permite iniciar uma montagem.
-4. **Estoque** - informa materiais disponíveis, necessidade total e itens faltantes.
-5. **Perfil** - concentra a participação do voluntário e suas contribuições.
+Uma casinha só poderá constar como **instalada** depois de validação física e registro de evidência. Um local só poderá constar como ponto oficial depois de validação e autorização pertinentes.
 
-A fase atual é um **MVP acadêmico/piloto**. O fluxo mobile, a organização de materiais, a meta de 10 casinhas e os protótipos estão implementados. Funcionalidades de produção, como banco de dados persistente, autenticação, mapa cartográfico real, notificações oficiais e integração com órgãos públicos, permanecem como evolução futura.
+## Impacto social esperado
 
-## 🏠 Fase piloto: até 10 casinhas
+O projeto pretende contribuir para:
 
-A meta inicial foi deliberadamente limitada a **10 casinhas comunitárias**. O objetivo não é criar uma operação de grande escala neste primeiro momento, mas validar:
+- melhorar a organização das necessidades dos pontos;
+- facilitar a participação de voluntários;
+- direcionar doações de materiais para necessidades objetivas;
+- registrar manutenção e reposições;
+- reduzir a dependência de informação dispersa em mensagens e planilhas;
+- permitir avaliação do piloto por indicadores;
+- aproximar formação acadêmica em ADS de um problema social real.
 
-- interesse e adesão de voluntários;
-- disponibilidade de materiais;
-- facilidade de construção e manutenção;
-- capacidade de acompanhamento pelo aplicativo;
-- aceitação dos pontos pelas comunidades e parceiros;
-- viabilidade de futuras parcerias.
+Impacto esperado não é apresentado como resultado já alcançado. Resultados reais serão documentados somente após validação de campo.
 
-Os pontos futuros somente devem ser considerados definitivos após validação do local e autorização do responsável pelo espaço.
+## Viabilidade financeira
 
-## 👥 A quem o projeto se destina?
+A fase inicial prioriza **doações de materiais e serviços**, sem arrecadação financeira direta pelo aplicativo. O orçamento do piloto deve separar:
 
-- animais comunitários e animais em situação de rua;
-- moradores e cuidadores locais;
-- protetores independentes;
-- voluntários da comunidade;
-- estudantes e equipe de extensão do UNIPÊ;
-- comerciantes e empresas parceiras;
-- pet shops, depósitos, madeireiras e estabelecimentos que possam doar insumos;
-- ONGs e grupos de proteção animal;
-- poder público, quando houver interesse e instrumento formal de parceria.
+1. materiais de construção e acabamento;
+2. ferramentas e equipamentos de proteção;
+3. identificação do ponto;
+4. transporte/logística;
+5. manutenção e substituições;
+6. contingência.
 
-## 🧭 Responsabilidades e manutenção
+A fórmula básica proposta é:
 
-### Manutenção física
+`Necessidade financeira = custo total validado - materiais/serviços doados e comprovados`
 
-A proposta é que cada ponto tenha, sempre que possível, um **voluntário ou cuidador de referência**, apoiado pela coordenação do projeto e pela comunidade local. Esse responsável ajuda a observar limpeza, água, alimento, conservação da estrutura e necessidade de reparos.
+Qualquer futura arrecadação em dinheiro deve usar canal institucional ou parceiro formal autorizado, com prestação de contas.
 
-A participação de prefeitura, órgãos públicos, empresas ou instituições na manutenção física **não deve ser tratada como obrigação automática**. Uma responsabilidade formal somente existe quando houver convênio, termo de parceria, autorização ou instrumento equivalente definindo atribuições.
+## Contexto municipal e independência
 
-### Manutenção tecnológica
+O levantamento documental identificou iniciativas legislativas municipais relacionadas a comedouros/bebedouros, abrigos sustentáveis e aplicativo de adoção. Elas são registradas **apenas como contexto local**.
 
-Durante a execução extensionista, a manutenção do código, protótipos e documentação fica sob responsabilidade da **equipe acadêmica de ADS**, com acompanhamento docente. O repositório GitHub registra a evolução do projeto e facilita continuidade e auditoria.
+> **O Padrinhos de Rua é um projeto extensionista, acadêmico e voluntário desenvolvido de forma independente, sem vínculo institucional, político, administrativo ou operacional com proposições legislativas, seus autores, a Câmara Municipal ou a Prefeitura de João Pessoa.**
 
-Para continuidade após o encerramento da atividade acadêmica, deverá ser indicado um novo mantenedor - por exemplo, nova equipe de extensão, laboratório/projeto institucional ou parceiro formal. Sem essa definição, não é adequado prometer suporte técnico permanente.
+A convergência está no problema social. O escopo do Padrinhos de Rua está na organização tecnológica e voluntária da continuidade operacional dos pontos.
 
-## 📦 Como serão obtidos os insumos?
+Veja: [`docs/CONTEXTO_E_DIFERENCIACAO.md`](./docs/CONTEXTO_E_DIFERENCIACAO.md).
 
-A estratégia prioritária é utilizar doações e materiais de baixo custo ou reaproveitáveis, por meio de:
+## Tecnologias do MVP
 
-- doações de moradores e voluntários;
-- parcerias com comércio local;
-- pet shops, depósitos de construção, madeireiras e empresas;
-- campanhas universitárias;
-- apoio de ONGs e grupos de proteção;
-- apoio público, caso exista parceria formal;
-- reaproveitamento responsável de materiais adequados e seguros.
-
-O aplicativo ajuda a tornar a necessidade objetiva: em vez de solicitar “qualquer doação”, o estoque pode informar exatamente **qual material está faltando e em qual quantidade**.
-
-## 📣 E quando as doações não forem suficientes?
-
-O projeto prevê campanhas direcionadas, por exemplo:
-
-- divulgação da lista de materiais faltantes no aplicativo e nas redes sociais;
-- compartilhamento em WhatsApp e grupos comunitários;
-- campanha “adote um material” ou “ajude a completar uma casinha”;
-- mutirões de arrecadação no UNIPÊ;
-- abordagem de empresas e comércios parceiros;
-- campanhas por bairro para necessidades específicas.
-
-Caso futuramente exista arrecadação em dinheiro, ela deve ocorrer **somente por canal institucional ou parceiro formal autorizado**, com regras de transparência e prestação de contas. A fase inicial prioriza doação de materiais e serviços para reduzir complexidade financeira.
-
-## 🛠️ Tecnologias utilizadas
-
-- React
+- React 19
 - TypeScript
 - Vite
 - Tailwind CSS
 - Vite PWA
 - Lucide React
-- Git e GitHub
-- prototipação mobile para reprodução no Figma
+- Git/GitHub
 
-## 🧪 Estado atual do projeto
+O código principal não utiliza IA, Express, chaves externas, câmera ou geolocalização nesta fase. Algumas dependências históricas permanecem no lockfile para preservar a instalação reproduzível e serão removidas em uma manutenção específica do conjunto de dependências.
 
-- ✅ fluxo mobile first consolidado;
-- ✅ PWA compilando para produção;
-- ✅ meta piloto limitada a 10 casinhas;
-- ✅ controle simples de estoque e déficit;
-- ✅ fluxo de oficina comunitária;
-- ✅ protótipos mobile registrados no repositório;
-- ✅ documentação do projeto em evolução;
-- 🟡 mapa cartográfico real: evolução futura;
-- 🟡 banco de dados persistente e autenticação: evolução futura;
-- 🟡 notificações e integrações institucionais: evolução futura;
-- 🟡 implantação física das casinhas: depende de materiais, voluntários e autorizações.
+## Documento acadêmico principal
 
-## 📊 Indicadores sugeridos para a fase piloto
+- [Relatório Acadêmico Consolidado - PDF](./docs/Padrinhos_de_Rua_Relatorio_Academico_Consolidado.pdf)
+- [Relatório Acadêmico Consolidado - DOCX](./docs/Padrinhos_de_Rua_Relatorio_Academico_Consolidado.docx)
+- [Planilha de Viabilidade Financeira do Piloto](./docs/Planilha_Viabilidade_Financeira_Piloto.xlsx)
 
-- número de pontos ativos;
-- frequência de reposição de água e comida;
-- número de voluntários participantes;
-- materiais arrecadados e déficit de estoque;
-- casinhas planejadas, em montagem, prontas e instaladas;
-- ocorrências reportadas e resolvidas;
-- tempo médio entre alerta e atendimento;
-- participação de parceiros locais;
-- retorno da comunidade sobre facilidade de uso do aplicativo.
+## Protótipos
 
-## ⚠️ Riscos e cuidados
+O repositório possui 11 telas mobile produzidas ao longo da evolução do projeto. Elas são tratadas como protótipos acadêmicos/demonstrativos quando exibirem números ainda não validados. A organização e as regras de leitura estão descritas em [`prototipos/README.md`](./prototipos/README.md), incluindo a separação entre protótipo visual e funcionalidade efetivamente implementada.
 
-- vandalismo e furto;
-- abandono ou falta de manutenção do ponto;
-- instalação sem autorização;
-- materiais inadequados ou inseguros;
-- exposição excessiva de localização ou dados pessoais;
-- dependência de poucos voluntários;
-- falta de continuidade técnica após o semestre/projeto;
-- crescimento acima da capacidade real de manutenção.
+## Documentação de apoio
 
-A expansão deve ocorrer somente depois de avaliar os resultados da fase piloto.
+- [`docs/PROJETO_EXTENSIONISTA_COMPLETO.md`](./docs/PROJETO_EXTENSIONISTA_COMPLETO.md)
+- [`docs/CONTEXTO_E_DIFERENCIACAO.md`](./docs/CONTEXTO_E_DIFERENCIACAO.md)
+- [`docs/IMPACTO_PROS_CONTRAS.md`](./docs/IMPACTO_PROS_CONTRAS.md)
+- [`docs/VIABILIDADE_FINANCEIRA.md`](./docs/VIABILIDADE_FINANCEIRA.md)
+- [`docs/REQUISITOS.md`](./docs/REQUISITOS.md)
+- [`docs/REGRAS_DE_NEGOCIO.md`](./docs/REGRAS_DE_NEGOCIO.md)
+- [`docs/MODELO_DE_DADOS.md`](./docs/MODELO_DE_DADOS.md)
+- [`docs/PRIVACIDADE_E_SEGURANCA.md`](./docs/PRIVACIDADE_E_SEGURANCA.md)
+- [`docs/OPERACAO_E_MANUTENCAO.md`](./docs/OPERACAO_E_MANUTENCAO.md)
+- [`docs/INDICADORES_E_VALIDACAO.md`](./docs/INDICADORES_E_VALIDACAO.md)
+- [`docs/ROTEIRO_VIDEO_DEMONSTRACAO.md`](./docs/ROTEIRO_VIDEO_DEMONSTRACAO.md)
+- [`docs/LIMPEZA_E_REAPROVEITAMENTO_CODIGO.md`](./docs/LIMPEZA_E_REAPROVEITAMENTO_CODIGO.md)
 
-## 🎨 Protótipos mobile
-
-Os protótipos ficam em [`prototipos/mobile`](./prototipos/mobile) e incluem telas de boas-vindas, cadastro, mapa, detalhes do ponto, reporte, planejamento da casinha, estoque, doação, produção/distribuição, perfil e contribuições.
-
-Exemplos:
-
-| Mapa | Planejamento da casinha | Estoque |
-|---|---|---|
-| ![Mapa](./prototipos/mobile/mapa_de_apoio_animal_em_joao_pessoa.png) | ![Casinha](./prototipos/mobile/planeje_sua_casinha_de_abrigo.png) | ![Estoque](./prototipos/mobile/estoque_de_materiais_para_abrigos.png) |
-
-## 🚀 Executando localmente
+## Executando localmente
 
 ```bash
 npm install
+npm run validate:project
+npm run lint
 npm run dev
 ```
 
-Verificação de tipos:
+Validação completa (coerência + TypeScript + build):
 
 ```bash
-npm run lint
+npm run check
 ```
 
-Build de produção:
+O GitHub Actions executa automaticamente validação de coerência, TypeScript e build em pushes e pull requests para `main`.
 
-```bash
-npm run build
-```
+## Limites do MVP
 
-## 📚 Origem acadêmica
+Nesta etapa, não são tratados como concluídos: banco compartilhado de produção, autenticação, mapa cartográfico real, notificações oficiais, parceria institucional, implantação física das casinhas ou validação comunitária formal.
+
+## Origem acadêmica
 
 Projeto de extensão do curso de **Análise e Desenvolvimento de Sistemas - UNIPÊ**.
 
-O projeto busca demonstrar como conhecimentos de desenvolvimento de software podem ser aplicados a uma necessidade social real, unindo **responsabilidade social, participação comunitária e tecnologia**.
-
-## 📌 Nota de escopo
-
-Este repositório representa um projeto acadêmico em fase piloto. Os locais ilustrativos e previsões de instalação não constituem autorização pública, compromisso da administração municipal ou obrigação de terceiros. Qualquer implantação em espaço público ou privado depende de validação e autorização do responsável competente.
+Responsável geral pelo material consolidado: **Priscilla Santos Cahino**.

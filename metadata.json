@@ -1,14 +1,12 @@
 {
   "name": "Padrinhos de Rua",
-  "description": "Projeto de extensão do curso de Análise e Desenvolvimento de Sistemas do UNIPÊ que aplica tecnologia social ao cuidado comunitário de animais em situação de rua em João Pessoa (PB). A fase piloto integra pontos de água e comida, participação voluntária, controle de materiais e uma meta inicial de até 10 casinhas comunitárias.",
-  "requestFramePermissions": [
-    "camera",
-    "geolocation"
-  ],
+  "description": "Projeto de extensão de ADS do UNIPÊ que propõe tecnologia social para organizar o cuidado comunitário de animais em João Pessoa (PB). O piloto prevê até 10 casinhas, ainda sem nenhuma instalação física confirmada.",
+  "requestFramePermissions": [],
   "majorCapabilities": [
     "PWA_MOBILE_FIRST",
-    "ORGANIZACAO_DE_PONTOS_COMUNITARIOS",
-    "CONTROLE_COMUNITARIO_DE_ESTOQUE",
-    "GESTAO_DE_VOLUNTARIADO"
-  ]
+    "PLANEJAMENTO_DE_PONTOS_COMUNITARIOS",
+    "CONTROLE_DE_ESTOQUE_DEMONSTRATIVO",
+    "PLANEJAMENTO_DE_VOLUNTARIADO"
+  ],
+  "dataMode": "DEMONSTRATIVO_ENQUANTO_NAO_VALIDADO_EM_CAMPO"
 }
