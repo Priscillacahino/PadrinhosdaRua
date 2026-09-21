@@ -1,83 +1,83 @@
-# 🐾 Padrinhos de Rua
+﻿# ðŸ¾ Padrinhos de Rua
 
-> **Projeto de extensão de Análise e Desenvolvimento de Sistemas (ADS) do UNIPÊ, em fase de MVP acadêmico, que propõe tecnologia social para organizar o cuidado comunitário de animais em João Pessoa - PB.**
+> **Projeto de extensÃ£o de AnÃ¡lise e Desenvolvimento de Sistemas (ADS) do UNIPÃŠ, em fase de MVP acadÃªmico, que propÃµe tecnologia social para organizar o cuidado comunitÃ¡rio de animais em JoÃ£o Pessoa - PB.**
 
 ## Estado real do projeto
 
-**Nenhuma casinha está instalada no momento.** A fase atual é de planejamento, prototipação e validação do fluxo tecnológico. A meta piloto é de **até 10 casinhas**, condicionada a necessidade comprovada, materiais adequados, responsáveis de referência e autorização do local.
+**Nenhuma casinha estÃ¡ instalada no momento.** A fase atual Ã© de planejamento, prototipaÃ§Ã£o e validaÃ§Ã£o do fluxo tecnolÃ³gico. A meta piloto Ã© de **atÃ© 10 casinhas**, condicionada a necessidade comprovada, materiais adequados, responsÃ¡veis de referÃªncia e autorizaÃ§Ã£o do local.
 
-Os pontos, quantidades de estoque e movimentações exibidos no MVP podem ser **dados demonstrativos**. Eles existem para testar a interface e não devem ser interpretados como execução física, parceria, doação ou atendimento real.
+Os pontos, quantidades de estoque e movimentaÃ§Ãµes exibidos no MVP podem ser **dados demonstrativos**. Eles existem para testar a interface e nÃ£o devem ser interpretados como execuÃ§Ã£o fÃ­sica, parceria, doaÃ§Ã£o ou atendimento real.
 
 ## Problema que o projeto procura enfrentar
 
-Ações comunitárias de apoio a animais podem perder continuidade quando não há uma forma simples de acompanhar necessidades, responsáveis, reposição, manutenção, materiais e histórico. O Padrinhos de Rua propõe usar tecnologia para apoiar esse ciclo, sem substituir voluntários, protetores, instituições competentes ou atendimento veterinário.
+AÃ§Ãµes comunitÃ¡rias de apoio a animais podem perder continuidade quando nÃ£o hÃ¡ uma forma simples de acompanhar necessidades, responsÃ¡veis, reposiÃ§Ã£o, manutenÃ§Ã£o, materiais e histÃ³rico. O Padrinhos de Rua propÃµe usar tecnologia para apoiar esse ciclo, sem substituir voluntÃ¡rios, protetores, instituiÃ§Ãµes competentes ou atendimento veterinÃ¡rio.
 
-**Pergunta orientadora:** como a tecnologia pode ajudar uma rede voluntária a manter pontos comunitários de apoio animal organizados e acompanhados ao longo do tempo?
+**Pergunta orientadora:** como a tecnologia pode ajudar uma rede voluntÃ¡ria a manter pontos comunitÃ¡rios de apoio animal organizados e acompanhados ao longo do tempo?
 
 ## Proposta
 
-O aplicativo é pensado como PWA/mobile first e organiza cinco frentes:
+O aplicativo Ã© pensado como PWA/mobile first e organiza cinco frentes:
 
-- **Início:** situação do piloto, indicadores e formas de participação;
-- **Mapa:** visualização futura dos pontos e suas necessidades;
-- **Oficina:** planejamento das casinhas e etapas anteriores à instalação;
-- **Estoque:** materiais disponíveis, necessários e déficit;
-- **Perfil:** participação do voluntário e resultados comprovados.
+- **InÃ­cio:** situaÃ§Ã£o do piloto, indicadores e formas de participaÃ§Ã£o;
+- **Mapa:** visualizaÃ§Ã£o futura dos pontos e suas necessidades;
+- **Oficina:** planejamento das casinhas e etapas anteriores Ã  instalaÃ§Ã£o;
+- **Estoque:** materiais disponÃ­veis, necessÃ¡rios e dÃ©ficit;
+- **Perfil:** participaÃ§Ã£o do voluntÃ¡rio e resultados comprovados.
 
 ### Jornada operacional
 
-`PONTO → NECESSIDADE → VOLUNTÁRIO → ATENDIMENTO → MANUTENÇÃO → REGISTRO → HISTÓRICO → INDICADORES`
+`PONTO â†’ NECESSIDADE â†’ VOLUNTÃRIO â†’ ATENDIMENTO â†’ MANUTENÃ‡ÃƒO â†’ REGISTRO â†’ HISTÃ“RICO â†’ INDICADORES`
 
-O diferencial pretendido não é apenas criar casinhas ou um aplicativo, mas organizar a **continuidade do cuidado**.
+O diferencial pretendido nÃ£o Ã© apenas criar casinhas ou um aplicativo, mas organizar a **continuidade do cuidado**.
 
-## Separação entre planejamento e realidade
+## SeparaÃ§Ã£o entre planejamento e realidade
 
 | Categoria | Significado |
 |---|---|
 | **Real/validado** | atividade de campo comprovada e autorizada |
-| **Planejado** | intenção do piloto ainda não executada |
-| **Demonstrativo** | dado fictício usado exclusivamente para testar o MVP |
+| **Planejado** | intenÃ§Ã£o do piloto ainda nÃ£o executada |
+| **Demonstrativo** | dado fictÃ­cio usado exclusivamente para testar o MVP |
 
-Uma casinha só poderá constar como **instalada** depois de validação física e registro de evidência. Um local só poderá constar como ponto oficial depois de validação e autorização pertinentes.
+Uma casinha sÃ³ poderÃ¡ constar como **instalada** depois de validaÃ§Ã£o fÃ­sica e registro de evidÃªncia. Um local sÃ³ poderÃ¡ constar como ponto oficial depois de validaÃ§Ã£o e autorizaÃ§Ã£o pertinentes.
 
 ## Impacto social esperado
 
 O projeto pretende contribuir para:
 
-- melhorar a organização das necessidades dos pontos;
-- facilitar a participação de voluntários;
-- direcionar doações de materiais para necessidades objetivas;
-- registrar manutenção e reposições;
-- reduzir a dependência de informação dispersa em mensagens e planilhas;
-- permitir avaliação do piloto por indicadores;
-- aproximar formação acadêmica em ADS de um problema social real.
+- melhorar a organizaÃ§Ã£o das necessidades dos pontos;
+- facilitar a participaÃ§Ã£o de voluntÃ¡rios;
+- direcionar doaÃ§Ãµes de materiais para necessidades objetivas;
+- registrar manutenÃ§Ã£o e reposiÃ§Ãµes;
+- reduzir a dependÃªncia de informaÃ§Ã£o dispersa em mensagens e planilhas;
+- permitir avaliaÃ§Ã£o do piloto por indicadores;
+- aproximar formaÃ§Ã£o acadÃªmica em ADS de um problema social real.
 
-Impacto esperado não é apresentado como resultado já alcançado. Resultados reais serão documentados somente após validação de campo.
+Impacto esperado nÃ£o Ã© apresentado como resultado jÃ¡ alcanÃ§ado. Resultados reais serÃ£o documentados somente apÃ³s validaÃ§Ã£o de campo.
 
 ## Viabilidade financeira
 
-A fase inicial prioriza **doações de materiais e serviços**, sem arrecadação financeira direta pelo aplicativo. O orçamento do piloto deve separar:
+A fase inicial prioriza **doaÃ§Ãµes de materiais e serviÃ§os**, sem arrecadaÃ§Ã£o financeira direta pelo aplicativo. O orÃ§amento do piloto deve separar:
 
-1. materiais de construção e acabamento;
-2. ferramentas e equipamentos de proteção;
-3. identificação do ponto;
-4. transporte/logística;
-5. manutenção e substituições;
-6. contingência.
+1. materiais de construÃ§Ã£o e acabamento;
+2. ferramentas e equipamentos de proteÃ§Ã£o;
+3. identificaÃ§Ã£o do ponto;
+4. transporte/logÃ­stica;
+5. manutenÃ§Ã£o e substituiÃ§Ãµes;
+6. contingÃªncia.
 
-A fórmula básica proposta é:
+A fÃ³rmula bÃ¡sica proposta Ã©:
 
-`Necessidade financeira = custo total validado - materiais/serviços doados e comprovados`
+`Necessidade financeira = custo total validado - materiais/serviÃ§os doados e comprovados`
 
-Qualquer futura arrecadação em dinheiro deve usar canal institucional ou parceiro formal autorizado, com prestação de contas.
+Qualquer futura arrecadaÃ§Ã£o em dinheiro deve usar canal institucional ou parceiro formal autorizado, com prestaÃ§Ã£o de contas.
 
-## Contexto municipal e independência
+## Contexto municipal e independÃªncia
 
-O levantamento documental identificou iniciativas legislativas municipais relacionadas a comedouros/bebedouros, abrigos sustentáveis e aplicativo de adoção. Elas são registradas **apenas como contexto local**.
+O levantamento documental identificou iniciativas legislativas municipais relacionadas a comedouros/bebedouros, abrigos sustentÃ¡veis e aplicativo de adoÃ§Ã£o. Elas sÃ£o registradas **apenas como contexto local**.
 
-> **O Padrinhos de Rua é um projeto extensionista, acadêmico e voluntário desenvolvido de forma independente, sem vínculo institucional, político, administrativo ou operacional com proposições legislativas, seus autores, a Câmara Municipal ou a Prefeitura de João Pessoa.**
+> **O Padrinhos de Rua Ã© um projeto extensionista, acadÃªmico e voluntÃ¡rio desenvolvido de forma independente, sem vÃ­nculo institucional, polÃ­tico, administrativo ou operacional com proposiÃ§Ãµes legislativas, seus autores, a CÃ¢mara Municipal ou a Prefeitura de JoÃ£o Pessoa.**
 
-A convergência está no problema social. O escopo do Padrinhos de Rua está na organização tecnológica e voluntária da continuidade operacional dos pontos.
+A convergÃªncia estÃ¡ no problema social. O escopo do Padrinhos de Rua estÃ¡ na organizaÃ§Ã£o tecnolÃ³gica e voluntÃ¡ria da continuidade operacional dos pontos.
 
 Veja: [`docs/CONTEXTO_E_DIFERENCIACAO.md`](./docs/CONTEXTO_E_DIFERENCIACAO.md).
 
@@ -91,19 +91,19 @@ Veja: [`docs/CONTEXTO_E_DIFERENCIACAO.md`](./docs/CONTEXTO_E_DIFERENCIACAO.md).
 - Lucide React
 - Git/GitHub
 
-O código principal não utiliza IA, Express, chaves externas, câmera ou geolocalização nesta fase. Algumas dependências históricas permanecem no lockfile para preservar a instalação reproduzível e serão removidas em uma manutenção específica do conjunto de dependências.
+O cÃ³digo principal nÃ£o utiliza IA, Express, chaves externas, cÃ¢mera ou geolocalizaÃ§Ã£o nesta fase. Algumas dependÃªncias histÃ³ricas permanecem no lockfile para preservar a instalaÃ§Ã£o reproduzÃ­vel e serÃ£o removidas em uma manutenÃ§Ã£o especÃ­fica do conjunto de dependÃªncias.
 
-## Documento acadêmico principal
+## Documento acadÃªmico principal
 
-- [Relatório Acadêmico Consolidado - PDF](./docs/Padrinhos_de_Rua_Relatorio_Academico_Consolidado.pdf)
-- [Relatório Acadêmico Consolidado - DOCX](./docs/Padrinhos_de_Rua_Relatorio_Academico_Consolidado.docx)
+- [RelatÃ³rio AcadÃªmico Consolidado - PDF](./docs/Padrinhos_de_Rua_Relatorio_Academico_Consolidado.pdf)
+- [RelatÃ³rio AcadÃªmico Consolidado - DOCX](./docs/Padrinhos_de_Rua_Relatorio_Academico_Consolidado.docx)
 - [Planilha de Viabilidade Financeira do Piloto](./docs/Planilha_Viabilidade_Financeira_Piloto.xlsx)
 
-## Protótipos
+## ProtÃ³tipos
 
-O repositório possui 11 telas mobile produzidas ao longo da evolução do projeto. Elas são tratadas como protótipos acadêmicos/demonstrativos quando exibirem números ainda não validados. A organização e as regras de leitura estão descritas em [`prototipos/README.md`](./prototipos/README.md), incluindo a separação entre protótipo visual e funcionalidade efetivamente implementada.
+O repositÃ³rio possui 11 telas mobile produzidas ao longo da evoluÃ§Ã£o do projeto. Elas sÃ£o tratadas como protÃ³tipos acadÃªmicos/demonstrativos quando exibirem nÃºmeros ainda nÃ£o validados. A organizaÃ§Ã£o e as regras de leitura estÃ£o descritas em [`prototipos/README.md`](./prototipos/README.md), incluindo a separaÃ§Ã£o entre protÃ³tipo visual e funcionalidade efetivamente implementada.
 
-## Documentação de apoio
+## DocumentaÃ§Ã£o de apoio
 
 - [`docs/PROJETO_EXTENSIONISTA_COMPLETO.md`](./docs/PROJETO_EXTENSIONISTA_COMPLETO.md)
 - [`docs/CONTEXTO_E_DIFERENCIACAO.md`](./docs/CONTEXTO_E_DIFERENCIACAO.md)
@@ -121,26 +121,27 @@ O repositório possui 11 telas mobile produzidas ao longo da evolução do proje
 ## Executando localmente
 
 ```bash
-npm install
+npm ci
 npm run validate:project
 npm run lint
 npm run dev
 ```
 
-Validação completa (coerência + TypeScript + build):
+ValidaÃ§Ã£o completa (coerÃªncia + TypeScript + build):
 
 ```bash
 npm run check
 ```
 
-O GitHub Actions executa automaticamente validação de coerência, TypeScript e build em pushes e pull requests para `main`.
+O GitHub Actions executa automaticamente validaÃ§Ã£o de coerÃªncia, TypeScript e build em pushes e pull requests para `main`.
 
 ## Limites do MVP
 
-Nesta etapa, não são tratados como concluídos: banco compartilhado de produção, autenticação, mapa cartográfico real, notificações oficiais, parceria institucional, implantação física das casinhas ou validação comunitária formal.
+Nesta etapa, nÃ£o sÃ£o tratados como concluÃ­dos: banco compartilhado de produÃ§Ã£o, autenticaÃ§Ã£o, mapa cartogrÃ¡fico real, notificaÃ§Ãµes oficiais, parceria institucional, implantaÃ§Ã£o fÃ­sica das casinhas ou validaÃ§Ã£o comunitÃ¡ria formal.
 
-## Origem acadêmica
+## Origem acadÃªmica
 
-Projeto de extensão do curso de **Análise e Desenvolvimento de Sistemas - UNIPÊ**.
+Projeto de extensÃ£o do curso de **AnÃ¡lise e Desenvolvimento de Sistemas - UNIPÃŠ**.
 
-Responsável geral pelo material consolidado: **Priscilla Santos Cahino**.
+ResponsÃ¡vel geral pelo material consolidado: **Priscilla Santos Cahino**.
+
