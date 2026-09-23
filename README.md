@@ -2,6 +2,21 @@
 
 > **Projeto de extensão de Análise e Desenvolvimento de Sistemas (ADS) do UNIPÊ, em fase de MVP acadêmico, que propõe tecnologia social para organizar o cuidado comunitário de animais em João Pessoa - PB.**
 
+## 📌 Visão rápida
+
+| Item | Situação |
+|---|---|
+| **Formato** | PWA / mobile first |
+| **Fase** | MVP acadêmico |
+| **Foco** | organização da continuidade do cuidado comunitário |
+| **Protótipos** | 11 telas mobile documentadas no repositório |
+| **Implantação física** | ainda não realizada |
+| **Dados exibidos no MVP** | podem ser demonstrativos |
+
+O projeto prioriza transparência entre aquilo que já foi validado, o que está planejado e o que existe apenas para demonstração do MVP.
+
+---
+
 ## Estado real do projeto
 
 **Nenhuma casinha está instalada no momento.** A fase atual é de planejamento, prototipação e validação do fluxo tecnológico. A meta piloto é de **até 10 casinhas**, condicionada a necessidade comprovada, materiais adequados, responsáveis de referência e autorização do local.
