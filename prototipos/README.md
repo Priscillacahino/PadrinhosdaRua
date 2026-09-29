@@ -1,4 +1,4 @@
-# Organização recomendada dos protótipos
+﻿# Protótipos — Padrinhos de Rua
 
 O repositório original possui 11 telas mobile em PNG. A revisão recomenda apresentá-las como uma jornada, e não como imagens isoladas.
 
@@ -25,12 +25,13 @@ Cada tela deve indicar se é:
 - **implementação parcial**;
 - **evolução futura**.
 
-## Ajustes necessários nas telas antigas
+## Identificação das telas
 
-Como nenhuma casinha foi instalada, qualquer tela que mostre casas prontas/instaladas ou contribuições reais deve receber uma marca clara de **DADOS DEMONSTRATIVOS** ou ser atualizada para refletir planejamento.
+As 11 imagens desta pasta são **protótipos acadêmicos**. Para evitar que números, locais, contribuições, estoque ou situações simuladas sejam interpretados como operação real, as telas receberam identificação visual de **DADOS DEMONSTRATIVOS**.
 
-Também é recomendado substituir nomes de parceiros fictícios por rótulos genéricos e evitar endereços que pareçam pontos oficialmente autorizados.
+A aplicação atual é a referência funcional de estado do MVP. As imagens registram a evolução visual do projeto e não substituem os critérios de validação definidos na documentação.
 
 ## Figma
 
 Ao criar/atualizar o arquivo de alta fidelidade, manter a mesma navegação do MVP e incluir um pequeno componente visual de “Modo demonstrativo” nas telas que usam exemplos fictícios.
+

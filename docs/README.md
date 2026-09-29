@@ -1,4 +1,4 @@
-# Documentação do Padrinhos de Rua
+﻿# Documentação do Padrinhos de Rua
 
 Esta pasta reúne a documentação acadêmica e técnica do projeto extensionista. O documento principal é o **Relatório Acadêmico Consolidado**; os demais arquivos detalham partes específicas sem substituir o relatório.
 
@@ -24,7 +24,9 @@ Esta pasta reúne a documentação acadêmica e técnica do projeto extensionist
 - `ROTEIRO_VIDEO_DEMONSTRACAO.md` - roteiro acadêmico para demonstração em vídeo.
 - `LIMPEZA_E_REAPROVEITAMENTO_CODIGO.md` - decisões de simplificação do MVP.
 - `HISTORICO_AJUSTES.md` - histórico das correções consolidadas.
+- `STATUS_CONCLUSAO.md` - situação de fechamento do MVP acadêmico e pendências futuras.
 
 ## Estado de referência
 
 Na versão consolidada de setembro de 2026, o projeto registra **0 casinhas instaladas** e uma meta piloto de **até 10**, condicionada a validação, materiais, segurança, responsáveis e autorização. Dados usados para demonstrar o MVP não compõem resultados reais.
+
